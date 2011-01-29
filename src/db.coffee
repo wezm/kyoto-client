@@ -121,8 +121,17 @@ class DB
           when 200 then callback undefined, data
           else callback new Error("Unexpected response from server: #{response.statusCode}");
 
+  # Remove all values
+  clear: (callback) ->
+    request = @client.request 'GET', '/rpc/clear',
+      'Connection': 'keep-alive'
+    request.end()
 
-  clear: (error) ->
+    request.on 'response', (response) ->
+      response.on 'end', ->
+        switch response.statusCode
+          when 200 then callback()
+          else callback new Error("Unexpected response from server: #{response.statusCode}");
 
   # TODO: Add optional database arg
   # Note: value can be a string or Buffer for utf-8 strings it should be a Buffer
