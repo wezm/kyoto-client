@@ -33,6 +33,16 @@ module.exports =
           when 200 then callback undefined, response.headers
           when 404 then callback undefined, null
           else callback new Error("Unexpected response from server: #{response.statusCode}");
-  put: (client, key) ->
+  put: (client, key, value, callback) ->
+    request = client.request 'PUT', "/#{escape(key)}",
+      'Content-Length': value.length
+      'Connection': 'keep-alive '
+    request.end(value)
 
-  delete: (client, key) ->
+    request.on 'response', (response) ->
+      response.on 'end', ->
+        switch response.statusCode
+          when 201 then callback()
+          else callback new Error("Unexpected response from server: #{response.statusCode}");
+
+  delete: (client, key, callback) ->

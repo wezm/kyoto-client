@@ -113,32 +113,18 @@ class DB
           when 200 then callback()
           else callback new Error("Unexpected response from server: #{response.statusCode}");
 
-  # TODO: Add optional database arg
   # Note: value can be a string or Buffer for utf-8 strings it should be a Buffer
-  set: (key, value, callback) ->
-    path = "/#{escape(key)}"
-    request = @client.request 'PUT', path,
-      'Content-Length': value.length
-      'Connection': 'keep-alive '
-    request.end(value)
+  set: (key, value, args...) ->
+    switch args.length
+      when 1 then callback = args[0]
+      when 2
+        database = args[0]
+        callback = args[1]
+      else
+        throw new Error("Invalid number of arguments (#{args.length}) to set");
 
-    request.on 'response', (response) ->
-      # The whole response body will be buffered in memory
-      # if large values are going to be stored it would be
-      # better to write to a file if over some threshold
-      content_length = response.headers['content-length']
-      value = new Buffer(content_length)
-      offset = 0
-
-      # response.setEncoding('utf8'); # Need to review this it should be appending to a buffer
-      # response.on 'data', (chunk) ->
-      #   console.log("#{response.status}: #{chunk}")
-      #   offset += value.write(chunk)
-
-      response.on 'end', ->
-        switch response.statusCode
-          when 201 then callback()
-          else callback new Error("Unexpected response from server: #{response.statusCode}");
+    RestClient.put @client, key, value, (error) ->
+      callback error
 
   # [key], callback
   getCursor: (args...) ->
