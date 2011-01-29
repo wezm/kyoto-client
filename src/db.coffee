@@ -4,6 +4,7 @@ csv    = require 'csv'
 assert = require 'assert'
 
 Cursor = require './cursor'
+RestClient = require './rest_client'
 
 class DB
 
@@ -33,30 +34,8 @@ class DB
       else
         throw new Error("Invalid number of arguments (#{args.length}) to get");
 
-
-    path = "/#{escape(key)}"
-    request = @client.request 'GET', path,
-      'Connection': 'keep-alive'
-    request.end()
-
-    request.on 'response', (response) ->
-      # The whole response body will be buffered in memory
-      # if large values are going to be stored it would be
-      # better to write to a file if over some threshold
-      content_length = parseInt(response.headers['content-length'], 10)
-      value = new Buffer(content_length)
-      offset = 0
-
-      # response.setEncoding('utf8'); # Need to review this it should be appending to a buffer
-      response.on 'data', (chunk) ->
-        chunk.copy(value, offset, 0)
-        offset += chunk.length
-
-      response.on 'end', ->
-        switch response.statusCode
-          when 200 then callback undefined, value
-          when 404 then callback undefined, null
-          else callback new Error("Unexpected response from server: #{response.statusCode}");
+    RestClient.get @client, key, (error, value) ->
+      callback error, value
 
   getBulk: (keys, args...) ->
     switch args.length
