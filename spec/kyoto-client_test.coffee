@@ -36,7 +36,7 @@ vows.describe('kyoto-client').addBatch(
             db.get 'not-here', this.callback
             undefined
 
-          'returns null for the value': (error, value) ->
+          'returns null': (error, value) ->
             assert.isNull value
 
         'setting a value':
@@ -48,18 +48,52 @@ vows.describe('kyoto-client').addBatch(
           'allows the value to be retrieved': (error, value) ->
               assert.equal value.toString('utf8'), "Test Value"
 
-        'Cursor':
+        'getBulk':
+          topic: (db) ->
+            db.set 'bulk1', "Bulk Value 1", (error) =>
+              db.set 'bulk2', "Bulk Value 2", (error) =>
+                db.getBulk ['bulk1', 'bulk2', 'missing'], this.callback
+            undefined
+
+          'allows multiple values to be retrieved at once': (error, results) ->
+              assert.equal results.bulk1, "Bulk Value 1"
+              assert.equal results.bulk2, "Bulk Value 2"
+              assert.isUndefined results.missing
+
+        'Cursor with starting key':
           topic: (db) ->
             # Add a value for the cursor to retrieve
             db.set 'cursor-test', "Cursor\tValue", (error) =>
-              db.getCursor 'cursor-test', (error, cursor) =>
-                cursor.get this.callback
-
+              db.getCursor 'cursor-test', this.callback
             undefined
 
-          'current value can be retrieved': (error, key, value) ->
-            assert.equal key.toString('utf8'), "cursor-test"
-            assert.equal value.toString('utf8'), "Cursor\tValue"
+          'current value can be retrieved': (error, cursor) ->
+            cursor.get (error, key, value) ->
+              assert.equal key.toString('utf8'), "cursor-test"
+              assert.equal value.toString('utf8'), "Cursor\tValue"
+
+          'can be enumerated': (error, cursor) ->
+            count = 0
+            cursor.each (error, key, value) ->
+              assert.isUndefined error
+              if key?
+                count++
+              else
+                assert.ok count > 0, "count is greater than zero"
+
+        'Cursor with no start key':
+          topic: (db) ->
+            db.getCursor this.callback
+            undefined
+
+          'can be enumerated': (error, cursor) ->
+            count = 0
+            cursor.each (error, key, value) ->
+              assert.isUndefined error
+              if key?
+                count++
+              else
+                assert.ok count > 0, "count is greater than zero"
 
       #     'and clearing the datastore':
       #       topic: (error, error, bookmarks) ->
