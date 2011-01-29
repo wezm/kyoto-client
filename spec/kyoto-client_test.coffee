@@ -60,6 +60,19 @@ vows.describe('kyoto-client').addBatch(
               assert.equal results.bulk2, "Bulk Value 2"
               assert.isUndefined results.missing
 
+        'getBulk with escaped values':
+          topic: (db) ->
+            db.set 'bulk3', "Bulk\tValue", (error) =>
+              db.set 'bulk4', "Bulk Value 2", (error) =>
+                db.getBulk ['bulk3', 'bulk4'], this.callback
+            undefined
+
+          'allows multiple values to be retrieved at once': (error, results) ->
+              assert.equal results.bulk3, "Bulk\tValue"
+              assert.equal results.bulk4, "Bulk Value 2"
+              assert.isUndefined results.missing
+
+
         'Cursor with starting key':
           topic: (db) ->
             # Add a value for the cursor to retrieve
