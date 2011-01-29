@@ -3,25 +3,6 @@ kt = require '../lib/index'
 util = require 'util'
 assert = require 'assert'
 
-# Db = kt.Db
-
-# count = 0
-# valid_bookmark = ->
-#   count++
-#   {
-#     href: "http://example.com/#{count}",
-#     title: "Example Domain",
-#     description: "This is an test domain",
-#     tags: ["testing", "domain"],
-#     time: '2011-01-01 00:00:00'
-#     public: true
-#   }
-#
-# updatesField = (field, value) ->
-#   (error, bookmark) ->
-#     assert.equal bookmark[field], value
-#
-
 vows.describe('kyoto-client').addBatch(
   'Db':
     'creating the client':
@@ -108,43 +89,5 @@ vows.describe('kyoto-client').addBatch(
               else
                 assert.ok count > 0, "count is greater than zero"
 
-      #     'and clearing the datastore':
-      #       topic: (error, error, bookmarks) ->
-      #         bookmarks
-      #
-      #       'saving a bookmark':
-      #         topic: (bookmarks) ->
-      #           bookmarks.save(valid_bookmark(), this.callback)
-      #           undefined
-      #
-      #         'has no errors': (error, bookmark) ->
-      #           assert.isNull error
-      #
-      #         'sets the id of the bookmark': (error, bookmark) ->
-      #           assert.isNumber bookmark.id
-      #
-      #       'updating a bookmark':
-      #         topic: (bookmarks) ->
-      #           topic = this
-      #           bookmarks.save valid_bookmark(), (error, bookmark) ->
-      #             # Modify fields
-      #             bookmark.href = "http://new.example.com/"
-      #             bookmark.title = "Changed"
-      #             bookmark.description = "A changed description"
-      #             bookmark.public = false
-      #             bookmark.tags = ["one", "two"]
-      #
-      #             bookmarks.save bookmark, (error, bookmark) ->
-      #               # Retrieve the bookmark afresh
-      #               bookmarks.get(bookmark.id, topic.callback)
-      #           undefined
-      #
-      #         'updates the href': updatesField 'href', "http://new.example.com/"
-      #         'updates the title': updatesField 'title', "Changed"
-      #         'updates the description': updatesField 'description', 'A changed description'
-      #         'updates the public status': (error, bookmark) ->
-      #           assert.strictEqual bookmark.public, false
-      #         'updates the tags': (error, bookmark) ->
-      #           assert.deepEqual(bookmark.tags, ["one", "two"])
 
 ).export(module)
