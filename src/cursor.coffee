@@ -126,9 +126,12 @@ class Cursor
           callback undefined, null
 
   # The rpc call is delete
-  close: () ->
-    # Need to close the keep alive connection here.
-    # Make a request to /rpc/cur_delete without the keep alive header,
-    # which will close the connection after that request.
+  close: (callback) ->
+    request = @client.request 'GET', '/rpc/cur_delete',
+      'Connection': 'close'
+    request.end()
+
+    request.on 'end', ->
+      callback()
 
 module.exports = Cursor
