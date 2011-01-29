@@ -5,6 +5,7 @@ assert = require 'assert'
 
 Cursor = require './cursor'
 RestClient = require './rest_client'
+RpcClient = require './rpc_client'
 
 class DB
 
@@ -44,62 +45,23 @@ class DB
         database = args[0]
         callback = args[1]
       else
-        throw new Error("Invalid number of arguments (#{args.length}) to get");
+        throw new Error("Invalid number of arguments (#{args.length}) to getBulk");
 
-    value = ("_#{escape(key)}\t" for key in keys).join('\n')
+    rpc_args = {}
+    rpc_args.DB = database if database?
+    rpc_args["_#{key}"] = '' for key in keys
 
-    request = @client.request 'POST', '/rpc/get_bulk',
-      'Content-Length': value.length
-      'Connection': 'keep-alive '
-      'Content-Type': 'text/tab-separated-values; colenc=U'
-    request.end(value)
+    RpcClient.call @client, 'get_bulk', rpc_args, (error, status, output) ->
+      if error?
+        return callback error, output
+      else if status != 200
+        error = new Error("Unexpected response from server: #{status}")
+        return callback error, output
 
-    request.on 'response', (response) ->
-      data = {}
-
-      tsv = csv().fromStream response,
-        delimiter: "\t"
-        escape: ""
-        encoding: 'ascii'
-      .on 'data', (row, index) ->
-        assert.ok row.length >= 2
-        data[row[0]] = row[1]
-
-      # Determine if the content is encoded
-      [content_type, colenc] = response.headers['content-type'].split('; ')
-      assert.ok content_type == "text/tab-separated-values", "response not in expected TSV format"
-      if colenc?
-        colenc = colenc.substr -1, 1
-
-      keepIfResult = (row) ->
-        # Exclude keys that aren't the values being looked up
-        matches = row[0].match(/^_(.*)$/)
-        if matches?
-          row[0] = matches[1]
-        else
-          row = null
-        row
-
-      # Decode the data via a CSV transform
-      switch colenc
-        when 'U'
-          tsv.transform (row, index) ->
-            keepIfResult (unescape(col) for col in row)
-
-        when 'B'
-          throw new Error("Base64 encoding is not implemented yet")
-        # Quoted-printable is never selected by the server
-        # when 'Q'
-        #   throw new Error("Quoted-printable encoding is not implemented")
-        else
-          tsv.transform (row, index) ->
-            keepIfResult row
-
-      response.on 'end', ->
-        # X-Kt-Error header has error message if not 200
-        switch response.statusCode
-          when 200 then callback undefined, data
-          else callback new Error("Unexpected response from server: #{response.statusCode}");
+      results = {}
+      for key, value of output
+        results[key[1...key.length]] = value if key.length > 0 and key[0] == '_'
+      callback undefined, results
 
   # Remove all values
   clear: (callback) ->
