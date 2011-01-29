@@ -18,7 +18,7 @@ vows.describe('kyoto-client').addBatch(
           topic: (error, db) ->
             db
 
-          'getting a non-existent value':
+          'get non-existent value':
             topic: (db) ->
               db.get 'not-here', this.callback
               undefined
@@ -26,7 +26,7 @@ vows.describe('kyoto-client').addBatch(
             'returns null': (error, value) ->
               assert.isNull value
 
-          'setting a value':
+          'set':
             topic: (db) ->
               db.set 'test', "Test Value", (error) =>
                 db.get 'test', this.callback
@@ -80,18 +80,18 @@ vows.describe('kyoto-client').addBatch(
                 else
                   assert.ok count > 0, "count is greater than zero"
 
-          'Cursor with no start key':
-            topic: (db) ->
-              db.getCursor this.callback
-              undefined
+            'Cursor with no start key':
+              topic: (_, _, _, db) ->
+                db.getCursor this.callback
+                undefined
 
-            'can be enumerated': (error, cursor) ->
-              count = 0
-              cursor.each (error, key, value) ->
-                assert.isUndefined error
-                if key?
-                  count++
-                else
-                  assert.ok count > 0, "count is greater than zero"
+              'can be enumerated': (error, cursor) ->
+                count = 0
+                cursor.each (error, key, value) ->
+                  assert.isUndefined error
+                  if key?
+                    count++
+                  else
+                    assert.ok count > 0, "count is greater than zero"
 
 ).export(module)

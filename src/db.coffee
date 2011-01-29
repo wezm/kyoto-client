@@ -10,8 +10,8 @@ class DB
   # constructor: (x) ->
   #   # not sure we need to do anything here
 
-  open: (host, port) ->
-    @client = http.createClient(port, host)
+  open: (@host, @port) ->
+    @client = http.createClient(@port, @host)
     this
 
   close: (callback) ->
@@ -35,7 +35,8 @@ class DB
 
 
     path = "/#{escape(key)}"
-    request = @client.request 'GET', path
+    request = @client.request 'GET', path,
+      'Connection': 'keep-alive'
     request.end()
 
     request.on 'response', (response) ->

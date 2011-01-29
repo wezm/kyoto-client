@@ -6,6 +6,10 @@ assert = require 'assert'
 
 class Cursor
   constructor: (@db) ->
+    # Cursors have their own client so that the cursor id can be the same
+    # for each one
+    @client = http.createClient(@db.port, @db.host)
+    this
 
   _keepAliveRequest: (procedure, params) ->
     params.CUR = 1
@@ -14,7 +18,7 @@ class Cursor
       'Connection': 'keep-alive '
     path = "/rpc/#{procedure}?#{querystring.stringify params}"
 
-    request = @db.client.request 'GET', path, headers
+    request = @client.request 'GET', path, headers
 
   jump: (args...) ->
     switch args.length
@@ -51,7 +55,8 @@ class Cursor
 
   setValue: (value) ->
 
-  remove: () ->
+  # Remove the current cursor value
+  remove: (callback) ->
 
   # All three of these functions accept a step argument that indicates whether to
   # step or not. It seems 450 is returned when the cursor gets to the end
@@ -59,7 +64,7 @@ class Cursor
 
   getValue: () ->
 
-  # Get current value of cursor
+  # Get current key and value of cursor
   get: (args...) ->
     switch args.length
       when 1 then callback = args[0]
