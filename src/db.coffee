@@ -91,22 +91,26 @@ class DB
       if colenc?
         colenc = colenc.substr -1, 1
 
+      # Decode that data via a CSV transform
       switch colenc
         when 'U'
           tsv.transform (row, index) ->
-            newRow = (unescape(col) for col in row)
-            matches = newRow[0].match(/^_(.*)$/)
-            if matches?
-              newRow[0] = matches[1]
-            else
-              newRow = null
-            newRow
+            unescape(col) for col in row
 
         when 'B'
-          throw new Error("Base64 encoding is not implemented")
+          throw new Error("Base64 encoding is not implemented yet")
         # Quoted-printable is never selected by the server
         # when 'Q'
         #   throw new Error("Quoted-printable encoding is not implemented")
+
+      # Exclude keys that aren't the values being looked up
+      tsv.transform (row, index) ->
+        matches = row[0].match(/^_(.*)$/)
+        if matches?
+          row[0] = matches[1]
+        else
+          row = null
+        row
 
       response.on 'end', ->
         # X-Kt-Error header has error message if not 200
