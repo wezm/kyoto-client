@@ -32,6 +32,17 @@ vows.describe('kyoto-client').addBatch(
         assert.include output, 'conf_kt_version'
         assert.include output, 'conf_os_name'
 
+    'status':
+      topic: ->
+        db.status this.callback
+        undefined
+
+      'returns status information about the database': (error, output) ->
+        util.log util.inspect output
+        assert.isObject output
+        assert.ok Object.keys(output).length > 0
+        assert.include output, 'count'
+
     'get non-existent value':
       topic: ->
         db.get 'not-here', this.callback
