@@ -100,11 +100,11 @@ class Cursor
   # Enumerate all entries of the cursor, calling the callback for each one
   each: (callback) ->
     process.nextTick =>
-      this.get true, (error, key, value) =>
+      this.get true, (error, output) =>
         if error
-          callback error, key, value
+          callback error, output
         else if key != null
-          callback undefined, key, value
+          callback undefined, output
           this.each(callback)
         else
           callback undefined, null

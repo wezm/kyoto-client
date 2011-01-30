@@ -77,7 +77,7 @@ vows.describe('kyoto-client').addBatch(
 
             'can be enumerated': (error, cursor) ->
               count = 0
-              cursor.each (error, key, value) ->
+              cursor.each (error, output) ->
                 assert.isUndefined error
                 if key?
                   count++
@@ -91,7 +91,7 @@ vows.describe('kyoto-client').addBatch(
 
               'can be enumerated': (error, cursor) ->
                 count = 0
-                cursor.each (error, key, value) ->
+                cursor.each (error, output) ->
                   assert.isUndefined error
                   if key?
                     count++
