@@ -20,6 +20,18 @@ vows.describe('kyoto-client').addBatch(
       'returns the input': (error, output) ->
         assert.deepEqual output, {test: "Value"}
 
+    'report':
+      topic: ->
+        db.report this.callback
+        undefined
+
+      'returns reporting information': (error, output) ->
+        assert.isObject output
+        assert.ok Object.keys(output).length > 0
+        assert.include output, 'conf_kc_version'
+        assert.include output, 'conf_kt_version'
+        assert.include output, 'conf_os_name'
+
     'get non-existent value':
       topic: ->
         db.get 'not-here', this.callback
