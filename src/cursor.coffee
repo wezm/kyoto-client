@@ -12,15 +12,6 @@ class Cursor
     @client = http.createClient(@db.port, @db.host)
     this
 
-  _keepAliveRequest: (procedure, params) ->
-    params.CUR = 1
-
-    headers =
-      'Connection': 'keep-alive '
-    path = "/rpc/#{procedure}?#{querystring.stringify params}"
-
-    request = @client.request 'GET', path, headers
-
   jump: (args...) ->
     switch args.length
       when 1 then callback = args[0]
@@ -103,7 +94,7 @@ class Cursor
       this.get true, (error, output) =>
         if error
           callback error, output
-        else if key != null
+        else if output != null
           callback undefined, output
           this.each(callback)
         else
