@@ -25,6 +25,16 @@ class DB
     request.on 'end', ->
       callback()
 
+  echo: (input, callback) ->
+    RpcClient.call @client, 'echo', input, (error, status, output) ->
+      if error?
+        callback error, output
+      else if status != 200
+        error = new Error("Unexpected response from server: #{status}")
+        callback error, output
+      else
+        callback undefined, output
+
   # key, database, callback
   get: (key, args...) ->
     switch args.length
