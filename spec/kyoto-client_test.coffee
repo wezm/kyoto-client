@@ -67,9 +67,13 @@ vows.describe('kyoto-client').addBatch(
               undefined
 
             'current value can be retrieved': (error, cursor) ->
-              cursor.get (error, key, value) ->
-                assert.equal key.toString('utf8'), "cursor-test"
-                assert.equal value.toString('utf8'), "Cursor\tValue"
+              cursor.get (error, output) ->
+                assert.equal output.key.toString('utf8'), "cursor-test"
+                assert.equal output.value.toString('utf8'), "Cursor\tValue"
+
+            'current value can be removed': (error, cursor) ->
+              cursor.remove (error, output) ->
+                assert.isUndefined error
 
             'can be enumerated': (error, cursor) ->
               count = 0

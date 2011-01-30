@@ -1,7 +1,5 @@
 http   = require 'http'
 util   = require 'util'
-csv    = require 'csv'
-assert = require 'assert'
 
 Cursor = require './cursor'
 RestClient = require './rest_client'

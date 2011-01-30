@@ -58,6 +58,16 @@ class Cursor
 
   # Remove the current cursor value
   remove: (callback) ->
+    rpc_args = {CUR: 1}
+    RpcClient.call @client, 'cur_remove', rpc_args, (error, status, output) ->
+      if error?
+        callback error, output
+      else if status == 200
+        callback undefined, output
+      else if status == 450
+        callback new Error("Cursor has been invalidated"), output
+      else
+        callback new Error("Unexpected response from server: #{status}"), output
 
   # All three of these functions accept a step argument that indicates whether to
   # step or not. It seems 450 is returned when the cursor gets to the end
@@ -73,51 +83,19 @@ class Cursor
         step = args[0]
         callback = args[1]
       else
-        throw new Error("Invalid number of arguments (#{args.length}) to jump");
+        throw new Error("Invalid number of arguments (#{args.length}) to get");
 
-    params = {}
-    params.step = 1 if step?
-
-    request = this._keepAliveRequest 'cur_get', params
-    request.end()
-
-    request.on 'response', (response) ->
-      data = {}
-
-      tsv = csv().fromStream response,
-        delimiter: "\t"
-        escape: ""
-        encoding: 'ascii'
-      .on 'data', (row, index) ->
-        assert.ok row.length >= 2
-        data[row[0]] = row[1]
-
-      # Determine if the content is encoded
-      [content_type, colenc] = response.headers['content-type'].split('; ')
-      assert.ok content_type == "text/tab-separated-values", "response not in expected TSV format"
-      if colenc?
-        colenc = colenc.substr -1, 1
-
-      switch colenc
-        when 'U'
-          tsv.transform (row, index) ->
-            unescape(col) for col in row
-        when 'B'
-          throw new Error("Base64 encoding is not implemented")
-        # Quoted-printable is never selected by the server
-        # when 'Q'
-        #   throw new Error("Quoted-printable encoding is not implemented")
-
-      response.on 'end', ->
-        switch response.statusCode
-          when 200 then callback(undefined, data.key, data.value)
-          when 450
-            # X-Kt-Error
-            # callback new Error("Cursor has been invalidated")
-            callback undefined, null
-          else
-            callback new Error("Unexpected response from server: #{response.statusCode}")
-    # callback undefined
+    rpc_args = {CUR: 1}
+    rpc_args.step = 1 if step?
+    RpcClient.call @client, 'cur_get', rpc_args, (error, status, output) ->
+      if error?
+        callback error, output
+      else if status == 200
+        callback undefined, output
+      else if status == 450
+        callback new Error("Cursor has been invalidated"), output
+      else
+        callback new Error("Unexpected response from server: #{status}"), output
 
   # Enumerate all entries of the cursor, calling the callback for each one
   each: (callback) ->
