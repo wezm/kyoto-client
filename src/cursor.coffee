@@ -3,6 +3,7 @@ querystring = require 'querystring'
 csv = require 'csv'
 util = require 'util'
 assert = require 'assert'
+RpcClient = require './rpc_client'
 
 class Cursor
   constructor: (@db) ->
@@ -24,28 +25,28 @@ class Cursor
     switch args.length
       when 1 then callback = args[0]
       when 2
-        key = args[0]
+        key      = args[0]
         callback = args[1]
+      when 2
+        key      = args[0]
+        database = args[1]
+        callback = args[2]
       else
         throw new Error("Invalid number of arguments (#{args.length}) to jump");
 
-    params = {}
-    params.key = key if key?
+    rpc_args = {CUR: 1}
+    rpc_args.key = key if key?
+    rpc_args.DB = database if database?
 
-    request = this._keepAliveRequest 'cur_jump', params
-    request.end()
-
-    request.on 'response', (response) ->
-      response.on 'end', ->
-        switch response.statusCode
-          when 200 then callback()
-          when 450
-            # X-Kt-Error
-            callback new Error("Cursor has been invalidated")
-          else
-            callback new Error("Unexpected response from server: #{response.statusCode}")
-
-    # callback undefined
+    RpcClient.call @client, 'cur_jump', rpc_args, (error, status, output) ->
+      if error?
+        callback error, output
+      else if status == 200
+        callback undefined, output
+      else if status == 450
+        callback new Error("Cursor has been invalidated"), output
+      else
+        callback new Error("Unexpected response from server: #{status}"), output
 
   jumpBack: () ->
 
