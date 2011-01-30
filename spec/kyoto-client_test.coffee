@@ -38,18 +38,9 @@ vows.describe('kyoto-client').addBatch(
         undefined
 
       'returns status information about the database': (error, output) ->
-        util.log util.inspect output
         assert.isObject output
         assert.ok Object.keys(output).length > 0
         assert.include output, 'count'
-
-    'get non-existent value':
-      topic: ->
-        db.get 'not-here', this.callback
-        undefined
-
-      'returns null': (error, value) ->
-        assert.isNull value
 
     'set':
       topic: ->
@@ -59,6 +50,31 @@ vows.describe('kyoto-client').addBatch(
 
       'allows the value to be retrieved': (error, value) ->
           assert.equal value.toString('utf8'), "Test Value"
+
+    'add when record does not exist':
+      topic: ->
+        db.add 'add-test', "Some value", this.callback
+        undefined
+
+      'does not return an error': (error, output) ->
+        assert.isFalse error?
+
+      'add when record exists':
+        topic: ->
+          db.add 'add-test', "Different value", this.callback
+          undefined
+
+        'returns an error': (error, output) ->
+          assert.isTrue error?
+          assert.equal error.message, "Record exists"
+
+    'get non-existent value':
+      topic: ->
+        db.get 'not-here', this.callback
+        undefined
+
+      'returns null': (error, value) ->
+        assert.isNull value
 
     'getBulk':
       topic: ->

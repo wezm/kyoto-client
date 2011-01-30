@@ -63,6 +63,64 @@ class DB
       else
         callback undefined, output
 
+  # Remove all values
+  clear: (args...) ->
+    switch args.length
+      when 1 then callback = args[0]
+      when 2
+        database = args[0]
+        callback = args[1]
+      else
+        throw new Error("Invalid number of arguments (#{args.length}) to clear");
+
+    rpc_args = {}
+    rpc_args.DB = database if database?
+    RpcClient.call @client, 'clear', rpc_args, (error, status, output) ->
+      if error?
+        callback error, output
+      else if status != 200
+        error = new Error("Unexpected response from server: #{status}")
+        callback error, output
+      else
+        callback undefined, output
+
+  # Note: value can be a string or Buffer for utf-8 strings it should be a Buffer
+  set: (key, value, args...) ->
+    switch args.length
+      when 1 then callback = args[0]
+      when 2
+        database = args[0]
+        callback = args[1]
+      else
+        throw new Error("Invalid number of arguments (#{args.length}) to set");
+
+    RestClient.put @client, key, value, (error) ->
+      callback error
+
+  # Add a record if it doesn't already exist
+  add: (key, value, args...) ->
+    switch args.length
+      when 1 then callback = args[0]
+      when 2
+        database = args[0]
+        callback = args[1]
+      else
+        throw new Error("Invalid number of arguments (#{args.length}) to set");
+
+    rpc_args =
+      key: key
+      value: value
+    rpc_args.DB = database if database?
+    RpcClient.call @client, 'add', rpc_args, (error, status, output) ->
+      if error?
+        callback error, output
+      else if status == 200
+        callback undefined, output
+      else if status == 450
+        callback (new Error("Record exists")), output
+      else
+        callback new Error("Unexpected response from server: #{status}"), output
+
 
   # key, database, callback
   get: (key, args...) ->
@@ -101,40 +159,6 @@ class DB
       for key, value of output
         results[key[1...key.length]] = value if key.length > 0 and key[0] == '_'
       callback undefined, results
-
-  # Remove all values
-  clear: (args...) ->
-    switch args.length
-      when 1 then callback = args[0]
-      when 2
-        database = args[0]
-        callback = args[1]
-      else
-        throw new Error("Invalid number of arguments (#{args.length}) to clear");
-
-    rpc_args = {}
-    rpc_args.DB = database if database?
-    RpcClient.call @client, 'clear', rpc_args, (error, status, output) ->
-      if error?
-        callback error, output
-      else if status != 200
-        error = new Error("Unexpected response from server: #{status}")
-        callback error, output
-      else
-        callback undefined, output
-
-  # Note: value can be a string or Buffer for utf-8 strings it should be a Buffer
-  set: (key, value, args...) ->
-    switch args.length
-      when 1 then callback = args[0]
-      when 2
-        database = args[0]
-        callback = args[1]
-      else
-        throw new Error("Invalid number of arguments (#{args.length}) to set");
-
-    RestClient.put @client, key, value, (error) ->
-      callback error
 
   # [key], callback
   getCursor: (args...) ->
