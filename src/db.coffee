@@ -12,7 +12,7 @@ class DB
   # constructor: (x) ->
   #   # not sure we need to do anything here
 
-  open: (@host, @port) ->
+  open: (@host = 'localhost', @port = 1978) ->
     @client = http.createClient(@port, @host)
     this
 
