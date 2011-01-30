@@ -12,6 +12,14 @@ vows.describe('kyoto-client').addBatch(
       db.clear(this.callback)
       undefined
 
+    'echo':
+      topic: ->
+        db.echo {test: "Value"}, this.callback
+        undefined
+
+      'returns the input': (error, output) ->
+        assert.deepEqual output, {test: "Value"}
+
     'get non-existent value':
       topic: ->
         db.get 'not-here', this.callback
