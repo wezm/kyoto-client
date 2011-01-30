@@ -74,16 +74,25 @@ class DB
       callback undefined, results
 
   # Remove all values
-  clear: (callback) ->
-    request = @client.request 'GET', '/rpc/clear',
-      'Connection': 'keep-alive'
-    request.end()
+  clear: (args...) ->
+    switch args.length
+      when 1 then callback = args[0]
+      when 2
+        database = args[0]
+        callback = args[1]
+      else
+        throw new Error("Invalid number of arguments (#{args.length}) to clear");
 
-    request.on 'response', (response) ->
-      response.on 'end', ->
-        switch response.statusCode
-          when 200 then callback()
-          else callback new Error("Unexpected response from server: #{response.statusCode}");
+    rpc_args = {}
+    rpc_args.DB = database if database?
+    RpcClient.call @client, 'clear', rpc_args, (error, status, output) ->
+      if error?
+        callback error, output
+      else if status != 200
+        error = new Error("Unexpected response from server: #{status}")
+        callback error, output
+      else
+        callback undefined, output
 
   # Note: value can be a string or Buffer for utf-8 strings it should be a Buffer
   set: (key, value, args...) ->
