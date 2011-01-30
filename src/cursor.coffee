@@ -100,8 +100,7 @@ class Cursor
         else
           callback undefined, null
 
-  # The rpc call is delete
-  close: (callback) ->
+  delete: (callback) ->
     request = @client.request 'GET', '/rpc/cur_delete',
       'Connection': 'close'
     request.end()
