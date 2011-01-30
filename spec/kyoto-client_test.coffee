@@ -121,6 +121,9 @@ vows.describe('kyoto-client').addBatch(
         'calls the callback': (error, count) ->
           assert.isTrue count > 0, "count is greater than zero"
 
+        teardown: (_, cursor) ->
+          cursor.delete()
+
     'Cursor without a starting key':
       topic: ->
         db.set 'cursor-test2', "Cursor\tValue", (error) =>
@@ -139,5 +142,11 @@ vows.describe('kyoto-client').addBatch(
 
         'calls the callback': (error, count) ->
           assert.isTrue count > 0, "count is greater than zero"
+
+        teardown: (_, cursor) ->
+          cursor.delete()
+
+    teardown: ->
+      db.close()
 
 ).export(module)
