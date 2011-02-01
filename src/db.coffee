@@ -105,7 +105,7 @@ class DB
         database = args[0]
         callback = args[1]
       else
-        throw new Error("Invalid number of arguments (#{args.length}) to set");
+        throw new Error("Invalid number of arguments (#{args.length}) to add");
 
     rpc_args =
       key: key
@@ -120,6 +120,31 @@ class DB
         callback (new Error("Record exists")), output
       else
         callback new Error("Unexpected response from server: #{status}"), output
+
+  # Replace an existsing record
+  replace: (key, value, args...) ->
+    switch args.length
+      when 1 then callback = args[0]
+      when 2
+        database = args[0]
+        callback = args[1]
+      else
+        throw new Error("Invalid number of arguments (#{args.length}) to replace");
+
+    rpc_args =
+      key: key
+      value: value
+    rpc_args.DB = database if database?
+    RpcClient.call @client, 'replace', rpc_args, (error, status, output) ->
+      if error?
+        callback error, output
+      else if status == 200
+        callback undefined, output
+      else if status == 450
+        callback (new Error("Record does not exist")), output
+      else
+        callback new Error("Unexpected response from server: #{status}"), output
+
 
 
   # key, database, callback
