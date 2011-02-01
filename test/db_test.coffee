@@ -9,6 +9,9 @@ dbClear = (callback) ->
   db.clear (error, output) ->
     callback()
 
+p = (item) ->
+  util.log util.inspect item
+
 module.exports =
   echo: testCase
     setUp: dbClear
@@ -41,6 +44,9 @@ module.exports =
         test.ok output.hasOwnProperty 'count'
         test.done()
 
+  # TODO: set should accept numeric values and store them as such in Kyoto.
+  # This would allow them to be incremented/decremented with the appropriate
+  # functions.
   set: testCase
     setUp: dbClear
 
@@ -104,6 +110,27 @@ module.exports =
 
         db.get 'test', (error, value) ->
           test.equal value, "Value"
+          test.done()
+
+  increment: testCase
+    setUp: dbClear
+
+    'increments compatible records': (test) ->
+      test.expect 2
+      db.increment 'inc', 1, (error, output) ->
+        test.equal output.num, '1'
+
+        db.increment 'inc', 4, (error, output) ->
+          test.equal output.num, '5'
+          test.done()
+
+    'returns an error if the record is compatible': (test) ->
+      # Only records set via increment/decrement appear to be manipulatable with
+      # these functions.
+      test.expect 1
+      db.set 'inc', '1', (error, output) ->
+        db.increment 'inc', 1, (error, output) ->
+          test.ok error?
           test.done()
 
   get: testCase

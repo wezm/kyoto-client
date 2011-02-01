@@ -152,7 +152,7 @@ class DB
         database = args[0]
         callback = args[1]
       else
-        throw new Error("Invalid number of arguments (#{args.length}) to get");
+        throw new Error("Invalid number of arguments (#{args.length}) to append");
 
     rpc_args =
       key: key
@@ -166,6 +166,29 @@ class DB
         callback error, output
       else
         callback undefined, output
+
+  increment: (key, num, args...) ->
+    switch args.length
+      when 1 then callback = args[0]
+      when 2
+        database = args[0]
+        callback = args[1]
+      else
+        throw new Error("Invalid number of arguments (#{args.length}) to increment");
+
+    rpc_args =
+      key: key
+      num: num
+    rpc_args.DB = database if database?
+    RpcClient.call @client, 'increment', rpc_args, (error, status, output) ->
+      if error?
+        callback error, output
+      else if status == 200
+        callback undefined, output
+      else if status == 450
+        callback (new Error("The existing record was not compatible")), output
+      else
+        callback new Error("Unexpected response from server: #{status}"), output
 
   # key, database, callback
   get: (key, args...) ->
