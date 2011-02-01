@@ -124,9 +124,14 @@ module.exports =
           test.equal output.num, '5'
           test.done()
 
-    'returns an error if the record is compatible': (test) ->
-      # Only records set via increment/decrement appear to be manipulatable with
-      # these functions.
+    'can increment by negative values': (test) ->
+      test.expect 1
+      db.increment 'inc', -5, (error, output) ->
+        test.equal output.num, '-5'
+        test.done()
+
+    'returns an error if the record is incompatible': (test) ->
+      # Only records set via increment appear to be manipulatable with it.
       test.expect 1
       db.set 'inc', '1', (error, output) ->
         db.increment 'inc', 1, (error, output) ->
