@@ -145,7 +145,27 @@ class DB
       else
         callback new Error("Unexpected response from server: #{status}"), output
 
+  append: (key, value, args...) ->
+    switch args.length
+      when 1 then callback = args[0]
+      when 2
+        database = args[0]
+        callback = args[1]
+      else
+        throw new Error("Invalid number of arguments (#{args.length}) to get");
 
+    rpc_args =
+      key: key
+      value: value
+    rpc_args.DB = database if database?
+    RpcClient.call @client, 'append', rpc_args, (error, status, output) ->
+      if error?
+        callback error, output
+      else if status != 200
+        error = new Error("Unexpected response from server: #{status}")
+        callback error, output
+      else
+        callback undefined, output
 
   # key, database, callback
   get: (key, args...) ->

@@ -84,6 +84,27 @@ module.exports =
         test.equal error.message, "Record does not exist"
         test.done()
 
+  append: testCase
+    setUp: dbClear
+
+    'appends to an existing value': (test) ->
+      test.expect 2
+      db.set 'test', "Test", (error, output) ->
+        db.append 'test', " Value", (error, output) ->
+          test.ifError error
+
+          db.get 'test', (error, value) ->
+            test.equal value, "Test Value"
+            test.done()
+
+    'sets a non-existent value': (test) ->
+      test.expect 2
+      db.append 'test', "Value", (error, output) ->
+        test.ifError error
+
+        db.get 'test', (error, value) ->
+          test.equal value, "Value"
+          test.done()
 
   get: testCase
     setUp: dbClear
