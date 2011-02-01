@@ -138,6 +138,32 @@ module.exports =
           test.ok error?
           test.done()
 
+  incrementDouble: testCase
+    setUp: dbClear
+
+    'increments compatible records': (test) ->
+      test.expect 2
+      db.incrementDouble 'inc', 1.5, (error, output) ->
+        test.equal output.num, '1.500000'
+
+        db.incrementDouble 'inc', 4.95, (error, output) ->
+          test.equal output.num, '6.450000'
+          test.done()
+
+    'can increment by negative values': (test) ->
+      test.expect 1
+      db.incrementDouble 'inc', -1.25, (error, output) ->
+        test.equal output.num, '-1.250000'
+        test.done()
+
+    'returns an error if the record is incompatible': (test) ->
+      # Only records set via increment appear to be manipulatable with it.
+      test.expect 1
+      db.set 'inc', '1.3', (error, output) ->
+        db.incrementDouble 'inc', 0.100000, (error, output) ->
+          test.ok error?
+          test.done()
+
   get: testCase
     setUp: dbClear
 

@@ -190,6 +190,29 @@ class DB
       else
         callback new Error("Unexpected response from server: #{status}"), output
 
+  incrementDouble: (key, num, args...) ->
+    switch args.length
+      when 1 then callback = args[0]
+      when 2
+        database = args[0]
+        callback = args[1]
+      else
+        throw new Error("Invalid number of arguments (#{args.length}) to incrementDouble");
+
+    rpc_args =
+      key: key
+      num: num
+    rpc_args.DB = database if database?
+    RpcClient.call @client, 'increment_double', rpc_args, (error, status, output) ->
+      if error?
+        callback error, output
+      else if status == 200
+        callback undefined, output
+      else if status == 450
+        callback (new Error("The existing record was not compatible")), output
+      else
+        callback new Error("Unexpected response from server: #{status}"), output
+
   # key, database, callback
   get: (key, args...) ->
     switch args.length
