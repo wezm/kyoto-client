@@ -213,7 +213,31 @@ class DB
       else
         callback new Error("Unexpected response from server: #{status}"), output
 
-  # key, database, callback
+  cas: (key, oval, nval, args...) ->
+    switch args.length
+      when 1 then callback = args[0]
+      when 2
+        database = args[0]
+        callback = args[1]
+      else
+        throw new Error("Invalid number of arguments (#{args.length}) to cas");
+
+    rpc_args =
+      key: key
+      oval: oval
+    rpc_args.nval = nval if nval?
+    rpc_args.DB = database if database?
+    RpcClient.call @client, 'cas', rpc_args, (error, status, output) ->
+      if error?
+        callback error, output
+      else if status == 200
+        callback undefined, output
+      else if status == 450
+        callback (new Error("Record has changed")), output
+      else
+        callback new Error("Unexpected response from server: #{status}"), output
+
+  # key, [database], callback
   get: (key, args...) ->
     switch args.length
       when 1 then callback = args[0]

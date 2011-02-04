@@ -124,7 +124,9 @@ db.report(function(error, output) {
 <a name="play_script"></a>
 #### ◆ playScript
 
-Call a procedure of the script language extension.
+Call a procedure of the script language ([Lua]) extension.
+
+[Lua]: http://www.lua.org/
 
 Not yet implemented.
 
@@ -394,9 +396,51 @@ db.set('incompatible', "1", function(error, output) {
 </code></pre>
 
 <a name="cas"></a>
-#### ◆ cas `cas()`
+#### ◆ cas `cas(key, oval, nval, [database], callback)`
 
-TODO
+Performs a compare-and-swap operation. The value is only updated if the 
+assumed existing value matches.
+
+* `key` [String] -- The key of the record
+* `oval` -- [String] or [Buffer] -- The assumed old value
+* `nval` -- [String] or [Buffer] -- The new value. Set to `null` to remove the
+  record.
+* `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
+* `callback(error, output)` [Function] -- Callback function
+  * `error` [Error] -- Set if an error occurs, otherwise `undefined`
+  * `output` [Object] -- Key-value pairs
+
+##### Example
+<pre class="highlight"><code class="language-js">
+// sets the new value when the old value matches
+db.set('test', 'old', function() {
+  db.cas('test', 'old', 'new', function(error, output) {
+    db.get('test', function(error, value) {
+      // value ➞ 'new'
+    });
+  });
+});
+
+// doesn't set the new value when the old value differs
+db.set('test', 'old', function() {
+  db.cas('test', 'not old', 'new', function(error, output) {
+    db.get('test', function(error, value) {
+      // value ➞ 'old'
+    });
+  });
+});
+
+// removes the record when the new value is null
+db.set('test', 'old', function() {
+  db.cas('test', 'old', null, function(error, output) {
+    db.get('test', function(error, value) {
+      // value ➞ null
+    });
+  });
+});
+</code></pre>
+
+
 
 <a name="remove"></a>
 #### ◆ remove `remove()`

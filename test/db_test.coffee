@@ -164,6 +164,37 @@ module.exports =
           test.ok error?
           test.done()
 
+  cas: testCase
+    setUp: dbClear
+
+    'sets the new value when the old value matches': (test) ->
+      test.expect 2
+      db.set 'test', 'old', ->
+        db.cas 'test', 'old', 'new', (error, output) ->
+          test.ifError error
+          db.get 'test', (error, value) ->
+            test.equal value, 'new'
+            test.done()
+
+    'doesn\'t set the new value when the old value differs': (test) ->
+      test.expect 3
+      db.set 'test', 'old', ->
+        db.cas 'test', 'not old', 'new', (error, output) ->
+          test.ok error?
+          test.equal error.message, "Record has changed"
+          db.get 'test', (error, value) ->
+            test.equal value, 'old'
+            test.done()
+
+    'removes the record when the new value is null': (test) ->
+      test.expect 2
+      db.set 'test', 'old', ->
+        db.cas 'test', 'old', null, (error, output) ->
+          test.ifError error
+          db.get 'test', (error, value) ->
+            test.equal value, null
+            test.done()
+
   get: testCase
     setUp: dbClear
 
