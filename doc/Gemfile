@@ -1,0 +1,18 @@
+# vim: ft=ruby
+
+source :rubygems
+
+gem 'nanoc'
+gem 'coderay'
+gem 'rdiscount'
+gem 'rainpress'
+gem 'rubypants'
+gem 'haml'
+gem 'guard'
+gem 'guard-nanoc'
+gem 'nokogiri'
+
+group :darwin do
+  gem 'rb-fsevent'
+  gem 'growl'
+end

@@ -1,0 +1,58 @@
+#!/usr/bin/env ruby
+
+# A few helpful tips about the Rules file:
+#
+# * The order of rules is important: for each item, only the first matching
+#   rule is applied.
+#
+# * Item identifiers start and end with a slash (e.g. “/about/” for the file
+#   “content/about.html”). To select all children, grandchildren, … of an
+#   item, use the pattern “/about/*/”; “/about/*” will also select the parent,
+#   because “*” matches zero or more characters.
+
+compile '/stylesheet/' do
+  filter :sass
+  filter :rainpress
+end
+
+compile '/highlight/' do
+  filter :rainpress
+end
+
+compile '/robots/' do
+end
+
+compile '/raphael-min/' do
+end
+
+compile '*' do
+  filter :erb
+  filter :rdiscount
+  filter :colorize_syntax,
+         :colorizers => { :js => :pygmentize },
+         :coderay => { :css => :class }
+  filter :rubypants
+  layout 'default'
+end
+
+route '/stylesheet/' do
+  '/screen.css'
+end
+
+route '/highlight/' do
+  '/highlight.css'
+end
+
+route '/raphael-min/' do
+  '/raphael.js'
+end
+
+route '/robots/' do
+  '/robots.txt'
+end
+
+route '*' do
+  item.identifier + 'index.html'
+end
+
+layout '*', :erb

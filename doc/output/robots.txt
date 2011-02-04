@@ -1,0 +1,6 @@
+--- 
+title: Robot Access
+is_hidden: true
+---
+User-Agent: *
+Disallow: 

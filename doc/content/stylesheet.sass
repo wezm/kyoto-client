@@ -1,0 +1,119 @@
+body
+  background: #fff
+  color: #222
+  margin: 0
+  padding: 0
+  font-family: 16px Cambria, Constantia, Georgia, Palatino, "Bitstream Vera Serif", "Liberation Serif", serif
+
+$monospace: Consolas, Menlo, Monaco, Inconsolata, "Andale Mono", "Bitstream Vera Sans Mono", "Lucida Console", Terminal, monospace
+$gap: 10px
+
+pre, code
+  font: 13px $monospace
+
+pre
+  background: #F3F3F3
+  border-bottom: 1px solid #CCC
+  border-top: 1px solid #CCC
+  padding: $gap
+
+h1,h2,h3,h4,h5,h6
+  // font-family: Corbel, Helvetica, sans-serif
+  color: black
+  font-weight: normal
+  margin: 0.6em 0 0.5em 0
+
+h1
+  sup
+    font-size: small
+
+.git sup
+  font: 9pt serif
+  padding: 0 2px 1px 2px
+  background: #EFEFEF
+  -webkit-border-radius: 2px
+  -moz-border-radius: 2px
+  border-radius: 2px
+  border: 1px solid #707070
+
+header
+  position: absolute
+  top: 0px
+  bottom: 0px
+  width: 205px
+  overflow-x: hidden
+  overflow-y: hidden
+  overflow: auto
+  padding: 20px 0 20px 20px
+
+  > h1
+    margin-top: 0
+
+  a
+    text-decoration: none
+    color: black
+
+    &.not-implemented
+      color: #666
+      font-style: italic
+
+    &:hover
+      text-decoration: underline
+
+  nav
+    li
+      margin: 0
+      padding-left: $gap
+      list-style: square
+
+footer
+  font-size: small
+  color: #333
+  text-align: center
+
+#main
+  position: absolute
+  top: 0px
+  bottom: 0px
+  left: 230px
+  overflow: auto
+  padding: 2 * $gap
+
+  > h1
+    line-height: 90px
+    margin-top: 0
+
+  h2
+    border-bottom: 3px solid #aaa
+
+  h3
+    border-bottom: 2px solid #aaa
+
+  h4
+    margin-top: 2em
+    font-weight: bold
+
+    > code
+      font-size: 14px
+      margin-left: 2 * $gap
+
+  h5
+    font-weight: bold
+
+  ul
+    // margin: 0
+    padding-left: 2 * $gap
+
+  // li
+  //   padding-left: $gap / 2
+
+  ul li > code ~ a
+    font-size: smaller
+    font-style: italic
+
+  #logo
+    display: block
+    width: 120px
+    height: 90px
+    float: left
+    margin-right: $gap
