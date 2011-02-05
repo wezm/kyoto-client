@@ -514,11 +514,30 @@ db.setBulk(records, function(error, output) {
 });
 </code></pre>
 
-
 <a name="removeBulk"></a>
-#### ◆ removeBulk `removeBulk()`
+#### ◆ removeBulk `removeBulk(keys, [database], callback)`
 
-TODO
+Remove multiple records at once.
+
+* `keys` [Array] -- An array of keys to remove
+* `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
+* `callback(error, output)` [Function] -- Callback function
+  * `error` [Error] -- Set if an error occurs, otherwise `undefined`
+  * `output` [Object] -- Result from the server
+    * `num` -- The number of records removed
+
+##### Example
+<pre class="highlight"><code class="language-js">
+var records = {
+  bulk1: "Bulk\tValue",
+  bulk2: "Bulk Value 2"
+};
+db.setBulk(records, function(error, output) {
+  db.removeBulk(Object.keys(records), function(error, output) {
+    // output -> {num: '2'}
+  })
+});
+</code></pre>
 
 <a name="getBulk"></a>
 #### ◆ getBulk `getBulk(keys, [database], callback)`

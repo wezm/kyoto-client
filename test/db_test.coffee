@@ -243,6 +243,21 @@ module.exports =
         test.equal output.num, '2'
         test.done()
 
+  removeBulk: testCase
+    setUp: dbClear
+
+    'allows multiple values to be removed at once': (test) ->
+      test.expect 3
+      records =
+        bulk1: "Bulk\tValue"
+        bulk2: "Bulk Value 2"
+      db.setBulk records, (error, output) ->
+        test.equal output.num, '2'
+        db.removeBulk records, (error, output) ->
+          test.ifError error
+          test.equal output.num, '2'
+          test.done()
+
   getBulk: testCase
     setUp: dbClear
 
