@@ -747,7 +747,7 @@ cursor.jump(function(error, output) {
 </code></pre>
 
 <a name="cur_step_back"></a>
-#### ◆ stepBack `stepBack()`
+#### ◆ stepBack `stepBack(callback)`
 
 Steps the cursor to the previous record.
 
