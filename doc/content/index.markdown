@@ -766,7 +766,28 @@ cursor.jumpBack(function(error, output) {
 </code></pre>
 
 <a name="cur_set_value"></a>
-#### ◆ setValue `setValue()`
+#### ◆ setValue `setValue(value, [step], callback)`
+
+Sets the value of the current record and optionally steps to the next
+record.
+
+* `value` [String] or [Buffer] -- The new value for the record
+* `step` [Boolean] -- When `true` step the cursor to the next record
+* `callback(error, value)` [Function] -- Callback function
+  * `error` [Error] -- Set if an error occurs, otherwise `undefined`
+  * `output` [Cursor] -- Key-value pairs
+
+##### Example
+<pre class="highlight"><code class="language-js">
+cursor.setValue("New Value", function(error, output) {
+  // value updated
+});
+
+// set and step
+cursor.setValue("New Value", true, function(error, output) {
+  // value updated
+});
+</code></pre>
 
 <a name="cur_remove"></a>
 #### ◆ remove `remove(callback)`

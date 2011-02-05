@@ -112,13 +112,22 @@ module.exports =
               test.equal output.key.toString('utf8'), "first"
               test.done()
 
-    get:
-      'returns the key and value': (test) ->
+    setValue:
+      'sets the value of the current record': (test) ->
         test.expect 2
-        @cursor.get (error, output) ->
-          test.equal output.key.toString('utf8'), "first"
-          test.equal output.value.toString('utf8'), "Cursor\tValue"
-          test.done()
+        @cursor.setValue "New Value", (error, output) =>
+          test.ifError error
+          @cursor.get (error, output) ->
+            test.equal output.value.toString('utf8'), "New Value"
+            test.done()
+
+      'allows stepping to the next record': (test) ->
+        test.expect 2
+        @cursor.setValue "New Value", true, (error, output) =>
+          test.ifError error
+          @cursor.get (error, output) ->
+            test.equal output.key.toString('utf8'), 'last'
+            test.done()
 
     remove:
       'removes the record': (test) ->
@@ -129,6 +138,14 @@ module.exports =
           db.get 'cursor-test', (error, value) ->
             test.ok value == null
             test.done()
+
+    get:
+      'returns the key and value': (test) ->
+        test.expect 2
+        @cursor.get (error, output) ->
+          test.equal output.key.toString('utf8'), "first"
+          test.equal output.value.toString('utf8'), "Cursor\tValue"
+          test.done()
 
     each:
       'yields records on each iteration': (test) ->

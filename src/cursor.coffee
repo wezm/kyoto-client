@@ -18,7 +18,7 @@ class Cursor
       when 2
         key      = args[0]
         callback = args[1]
-      when 2
+      when 3
         key      = args[0]
         database = args[1]
         callback = args[2]
@@ -50,7 +50,6 @@ class Cursor
   _stepUsing: (procedure, callback) ->
     rpc_args = {CUR: 1}
     rpc_args.key = key if key?
-    rpc_args.DB = database if database?
 
     RpcClient.call @client, procedure, rpc_args, (error, status, output) ->
       if error?
@@ -68,7 +67,27 @@ class Cursor
   stepBack: (callback) ->
     this._stepUsing 'cur_step_back', callback
 
-  setValue: (value, callback) ->
+  setValue: (value, args...) ->
+    switch args.length
+      when 1 then callback = args[0]
+      when 2
+        step     = args[0]
+        callback = args[1]
+      else
+        throw new Error("Invalid number of arguments (#{args.length}) to setValue");
+
+    rpc_args = {CUR: 1, value: value}
+    rpc_args.step = 1 if step?
+
+    RpcClient.call @client, 'cur_set_value', rpc_args, (error, status, output) ->
+      if error?
+        callback error, output
+      else if status == 200
+        callback undefined, output
+      else if status == 450
+        callback new Error("Cursor has been invalidated"), output
+      else
+        callback new Error("Unexpected response from server: #{status}"), output
 
   # Remove the current cursor value
   remove: (callback) ->
