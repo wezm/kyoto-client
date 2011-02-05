@@ -923,3 +923,11 @@ cursor.each(function(error, output) {
 [Number]: https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number
 [Object]: https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object
 [String]: https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String
+
+<a name="changelog"></a>
+Changelog
+---------
+
+### 0.1.0 -- <time datetime="2011-02-06">6 Feb 2011</time>
+
+Initial release.
