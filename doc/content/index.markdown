@@ -440,12 +440,29 @@ db.set('test', 'old', function() {
 });
 </code></pre>
 
-
-
 <a name="remove"></a>
-#### ◆ remove `remove()`
+#### ◆ remove `remove(key, [database], callback)`
 
-TODO
+Removes a record.
+
+* `key` [String] -- The key of the record to remove
+* `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
+* `callback(error)` [Function] -- Callback function
+  * `error` [Error] -- `undefined` if the record was successfully removed.
+
+##### Example
+<pre class="highlight"><code class="language-js">
+db.set('test', "Value", function() {
+  db.remove('test', function(error) {
+    // error -> undefined
+  });
+});
+
+// Non-existent record
+db.remove('non-existent', function(error) {
+  // error -> Error("Record not found")
+});
+</code></pre>
 
 <a name="get"></a>
 #### ◆ get `get(key, [database], callback)`

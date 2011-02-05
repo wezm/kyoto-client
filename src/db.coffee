@@ -237,6 +237,18 @@ class DB
       else
         callback new Error("Unexpected response from server: #{status}"), output
 
+  remove: (key, args...) ->
+    switch args.length
+      when 1 then callback = args[0]
+      when 2
+        database = args[0]
+        callback = args[1]
+      else
+        throw new Error("Invalid number of arguments (#{args.length}) to get");
+
+    RestClient.delete @client, key, (error) ->
+      callback error
+
   # key, [database], callback
   get: (key, args...) ->
     switch args.length

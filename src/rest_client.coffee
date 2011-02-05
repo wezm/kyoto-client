@@ -2,6 +2,7 @@
 module.exports =
   get: (client, key, callback) ->
     request = client.request 'GET', "/#{escape(key)}",
+      'Content-Length': 0
       'Connection': 'keep-alive'
     request.end()
 
@@ -21,9 +22,11 @@ module.exports =
         switch response.statusCode
           when 200 then callback undefined, value
           when 404 then callback undefined, null
-          else callback new Error("Unexpected response from server: #{response.statusCode}");
+          else callback new Error("Unexpected response from server: #{response.statusCode}")
+
   head: (client, key, callback) ->
     request = client.request 'HEAD', "/#{escape(key)}",
+      'Content-Length': 0
       'Connection': 'keep-alive'
     request.end()
 
@@ -32,7 +35,8 @@ module.exports =
         switch response.statusCode
           when 200 then callback undefined, response.headers
           when 404 then callback undefined, null
-          else callback new Error("Unexpected response from server: #{response.statusCode}");
+          else callback new Error("Unexpected response from server: #{response.statusCode}")
+
   put: (client, key, value, callback) ->
     request = client.request 'PUT', "/#{escape(key)}",
       'Content-Length': value.length
@@ -43,6 +47,17 @@ module.exports =
       response.on 'end', ->
         switch response.statusCode
           when 201 then callback()
-          else callback new Error("Unexpected response from server: #{response.statusCode}");
+          else callback new Error("Unexpected response from server: #{response.statusCode}")
 
   delete: (client, key, callback) ->
+    request = client.request 'DELETE', "/#{escape(key)}",
+      'Content-Length': 0
+      'Connection': 'keep-alive'
+    request.end()
+
+    request.on 'response', (response) ->
+      response.on 'end', ->
+        switch response.statusCode
+          when 204 then callback()
+          when 404 then callback new Error("Record not found")
+          else callback new Error("Unexpected response from server: #{response.statusCode}")

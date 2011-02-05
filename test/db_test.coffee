@@ -195,6 +195,25 @@ module.exports =
             test.equal value, null
             test.done()
 
+  remove: testCase
+    setUp: dbClear
+
+    'removes records that exist': (test) ->
+      test.expect 2
+      db.set 'test', 'old', ->
+        db.remove 'test', (error) ->
+          test.ifError error
+          db.get 'test', (error, value) ->
+            test.equal value, null
+            test.done()
+
+    'returns an error if the record doesn\'t exist': (test) ->
+      test.expect 2
+      db.remove 'test', (error) ->
+        test.ok error?
+        test.equal error.message, "Record not found"
+        test.done()
+
   get: testCase
     setUp: dbClear
 
