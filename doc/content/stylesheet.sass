@@ -16,6 +16,7 @@ pre
   border-bottom: 1px solid #CCC
   border-top: 1px solid #CCC
   padding: $gap
+  overflow-x: auto
 
 h1,h2,h3,h4,h5,h6
   color: black
@@ -79,6 +80,8 @@ footer
   top: 0px
   bottom: 0px
   left: 230px
+  right: 0px
+  min-width: 320px
   overflow: auto
   padding: 2 * $gap
 
@@ -125,3 +128,16 @@ footer
     height: 90px
     float: left
     margin-right: $gap
+
+// iOS fixes
+.touch
+
+  header
+    bottom: auto
+    overflow-x: visible
+    overflow-y: visible
+    overflow: visible
+
+  #main
+    bottom: auto
+    overflow: visible
