@@ -50,7 +50,7 @@ class DB
         database = args[0]
         callback = args[1]
       else
-        throw new Error("Invalid number of arguments (#{args.length}) to get");
+        throw new Error("Invalid number of arguments (#{args.length}) to status");
 
     rpc_args = {}
     rpc_args.DB = database if database?
@@ -244,7 +244,7 @@ class DB
         database = args[0]
         callback = args[1]
       else
-        throw new Error("Invalid number of arguments (#{args.length}) to get");
+        throw new Error("Invalid number of arguments (#{args.length}) to remove");
 
     RestClient.delete @client, key, (error) ->
       callback error
@@ -269,7 +269,7 @@ class DB
         database = args[0]
         callback = args[1]
       else
-        throw new Error("Invalid number of arguments (#{args.length}) to getBulk");
+        throw new Error("Invalid number of arguments (#{args.length}) to setBulk");
 
     rpc_args = {}
     rpc_args.DB = database if database?
