@@ -416,7 +416,7 @@ assumed existing value matches.
 db.set('test', 'old', function() {
   db.cas('test', 'old', 'new', function(error, output) {
     db.get('test', function(error, value) {
-      // value ➞ 'new'
+      // value -> 'new'
     });
   });
 });
@@ -425,7 +425,7 @@ db.set('test', 'old', function() {
 db.set('test', 'old', function() {
   db.cas('test', 'not old', 'new', function(error, output) {
     db.get('test', function(error, value) {
-      // value ➞ 'old'
+      // value -> 'old'
     });
   });
 });
@@ -434,7 +434,7 @@ db.set('test', 'old', function() {
 db.set('test', 'old', function() {
   db.cas('test', 'old', null, function(error, output) {
     db.get('test', function(error, value) {
-      // value ➞ null
+      // value -> null
     });
   });
 });
