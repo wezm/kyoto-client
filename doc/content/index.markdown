@@ -492,9 +492,28 @@ db.get('not here', function(error, value) {
 </code></pre>
 
 <a name="set_bulk"></a>
-#### ◆ setBulk `setBulk()`
+#### ◆ setBulk `setBulk(records, [database], callback)`
 
-TODO
+Set multiple records at once.
+
+* `records` [Object] -- The records to set with keys and values set appropriately.
+* `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
+* `callback(error, output)` [Function] -- Callback function
+  * `error` [Error] -- Set if an error occurs, otherwise `undefined`
+  * `output` [Object] -- Result from the server
+    * `num` -- The number of records set
+
+##### Example
+<pre class="highlight"><code class="language-js">
+var records = {
+  bulk1: "Bulk\tValue",
+  bulk2: "Bulk Value 2"
+};
+db.setBulk(records, function(error, output) {
+  // output -> {num: '2'}
+});
+</code></pre>
+
 
 <a name="removeBulk"></a>
 #### ◆ removeBulk `removeBulk()`
@@ -508,7 +527,7 @@ Retrieve multiple records at once.
 
 * `keys` [Array] -- An array of keys to retrieve
 * `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
-* `callback(error, value)` [Function] -- Callback function
+* `callback(error, results)` [Function] -- Callback function
   * `error` [Error] -- Set if an error occurs, otherwise `undefined`
   * `results` [Object] -- The values for each of the requested keys by key. Where a record
     doesn't exist for a key that key is absent from from the results object.

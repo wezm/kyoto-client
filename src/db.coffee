@@ -262,6 +262,27 @@ class DB
     RestClient.get @client, key, (error, value) ->
       callback error, value
 
+  setBulk: (records, args...) ->
+    switch args.length
+      when 1 then callback = args[0]
+      when 2
+        database = args[0]
+        callback = args[1]
+      else
+        throw new Error("Invalid number of arguments (#{args.length}) to getBulk");
+
+    rpc_args = {}
+    rpc_args.DB = database if database?
+    rpc_args["_#{key}"] = value for key, value of records
+
+    RpcClient.call @client, 'set_bulk', rpc_args, (error, status, output) ->
+      if error?
+        callback error, output
+      else if status == 200
+        callback undefined, output
+      else
+        callback new Error("Unexpected response from server: #{status}"), output
+
   getBulk: (keys, args...) ->
     switch args.length
       when 1 then callback = args[0]

@@ -230,6 +230,19 @@ module.exports =
           test.equal value, "Test\tValue"
           test.done()
 
+  setBulk: testCase
+    setUp: dbClear
+
+    'allows multiple values to be set at once': (test) ->
+      test.expect 2
+      records =
+        bulk1: "Bulk\tValue"
+        bulk2: "Bulk Value 2"
+      db.setBulk records, (error, output) ->
+        test.ifError error
+        test.equal output.num, '2'
+        test.done()
+
   getBulk: testCase
     setUp: dbClear
 
