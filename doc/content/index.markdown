@@ -805,10 +805,40 @@ cursor.remove(function(error, output) {
 </code></pre>
 
 <a name="cur_get_key"></a>
-#### ◆ getKey `getKey()`
+#### ◆ getKey `getKey([step], callback)`
+
+Get the key of the current record.
+
+* `step` [Boolean] -- When `true` step the cursor to the next record.
+* `callback(error, value)` [Function] -- Callback function
+  * `error` [Error] -- Set if an error occurs, otherwise `undefined`
+  * `output` [Object] -- Result from the server
+    * `key` -- The key of the current record
+
+##### Example
+<pre class="highlight"><code class="language-js">
+cursor.getKey(true, function(error, output) {
+  // output -> {key: 'test'}
+});
+</code></pre>
 
 <a name="cur_get_value"></a>
-#### ◆ getValue `getValue()`
+#### ◆ getValue `getValue([step], callback)`
+
+Get the value of the current record.
+
+* `step` [Boolean] -- When `true` step the cursor to the next record.
+* `callback(error, value)` [Function] -- Callback function
+  * `error` [Error] -- Set if an error occurs, otherwise `undefined`
+  * `output` [Object] -- Result from the server
+    * `value` -- The value of the current record
+
+##### Example
+<pre class="highlight"><code class="language-js">
+cursor.getValue(true, function(error, output) {
+  // output -> {value: "Value"}
+});
+</code></pre>
 
 <a name="cur_get"></a>
 #### ◆ get `get([step], callback)`
@@ -818,7 +848,9 @@ Get the key and value of the current record.
 * `step` [Boolean] -- When `true` step the cursor to the next record.
 * `callback(error, value)` [Function] -- Callback function
   * `error` [Error] -- Set if an error occurs, otherwise `undefined`
-  * `output` [Cursor] -- Key-value pairs
+  * `output` [Object] -- Result from the server
+    * `key` -- The key of the current record
+    * `value` -- The value of the current record
 
 ##### Example
 <pre class="highlight"><code class="language-js">

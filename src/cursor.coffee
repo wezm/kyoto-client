@@ -102,25 +102,18 @@ class Cursor
       else
         callback new Error("Unexpected response from server: #{status}"), output
 
-  # All three of these functions accept a step argument that indicates whether to
-  # step or not. It seems 450 is returned when the cursor gets to the end
-  getKey: () ->
-
-  getValue: () ->
-
-  # Get current key and value of cursor
-  get: (args...) ->
+  _getUsing: (procedure, args) ->
     switch args.length
       when 1 then callback = args[0]
       when 2
         step = args[0]
         callback = args[1]
       else
-        throw new Error("Invalid number of arguments (#{args.length}) to get");
+        throw new Error("Invalid number of arguments (#{args.length}) to #{procedure}");
 
     rpc_args = {CUR: 1}
     rpc_args.step = 1 if step?
-    RpcClient.call @client, 'cur_get', rpc_args, (error, status, output) ->
+    RpcClient.call @client, procedure, rpc_args, (error, status, output) ->
       if error?
         callback error, output
       else if status == 200
@@ -129,6 +122,19 @@ class Cursor
         callback new Error("Cursor has been invalidated"), output
       else
         callback new Error("Unexpected response from server: #{status}"), output
+
+
+  # All three of these functions accept a step argument that indicates whether to
+  # step or not. It seems 450 is returned when the cursor gets to the end
+  getKey: (args...) ->
+    this._getUsing 'cur_get_key', args
+
+  getValue: (args...) ->
+    this._getUsing 'cur_get_value', args
+
+  # Get current key and value of cursor
+  get: (args...) ->
+    this._getUsing 'cur_get', args
 
   # Enumerate all entries of the cursor, calling the callback for each one
   each: (callback) ->

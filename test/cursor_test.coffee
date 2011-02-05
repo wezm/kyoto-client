@@ -83,7 +83,7 @@ module.exports =
         test.expect 2
         @cursor.jump (error, output) =>
           test.ifError error
-          @cursor.get (error, output) ->
+          @cursor.getKey (error, output) ->
             test.equal output.key.toString('utf8'), "first"
             test.done()
 
@@ -91,7 +91,7 @@ module.exports =
         test.expect 1
         @cursor.jump (error, output) =>
           @cursor.step (error, output) =>
-            @cursor.get (error, output) ->
+            @cursor.getKey (error, output) ->
               test.equal output.key.toString('utf8'), "last"
               test.done()
 
@@ -100,7 +100,7 @@ module.exports =
         test.expect 2
         @cursor.jumpBack (error, output) =>
           test.ifError error
-          @cursor.get (error, output) ->
+          @cursor.getKey (error, output) ->
             test.equal output.key.toString('utf8'), "last"
             test.done()
 
@@ -117,7 +117,7 @@ module.exports =
         test.expect 2
         @cursor.setValue "New Value", (error, output) =>
           test.ifError error
-          @cursor.get (error, output) ->
+          @cursor.getValue (error, output) ->
             test.equal output.value.toString('utf8'), "New Value"
             test.done()
 
@@ -125,7 +125,7 @@ module.exports =
         test.expect 2
         @cursor.setValue "New Value", true, (error, output) =>
           test.ifError error
-          @cursor.get (error, output) ->
+          @cursor.getKey (error, output) ->
             test.equal output.key.toString('utf8'), 'last'
             test.done()
 
@@ -139,13 +139,51 @@ module.exports =
             test.ok value == null
             test.done()
 
+    getKey:
+      'returns the key of the current record': (test) ->
+        test.expect 1
+        @cursor.getKey (error, output) ->
+          test.equal output.key.toString('utf8'), "first"
+          test.done()
+
+      'allows stepping to the next record': (test) ->
+        test.expect 2
+        @cursor.getKey true, (error, output) =>
+          test.ifError error
+          @cursor.get (error, output) ->
+            test.equal output.key.toString('utf8'), 'last'
+            test.done()
+
+    getValue:
+      'returns the value of the current record': (test) ->
+        test.expect 1
+        @cursor.getValue (error, output) ->
+          test.equal output.value.toString('utf8'), "Cursor\tValue"
+          test.done()
+
+      'allows stepping to the next record': (test) ->
+        test.expect 2
+        @cursor.getValue true, (error, output) =>
+          test.ifError error
+          @cursor.get (error, output) ->
+            test.equal output.key.toString('utf8'), 'last'
+            test.done()
+
     get:
-      'returns the key and value': (test) ->
+      'returns the key and value of the current record': (test) ->
         test.expect 2
         @cursor.get (error, output) ->
           test.equal output.key.toString('utf8'), "first"
           test.equal output.value.toString('utf8'), "Cursor\tValue"
           test.done()
+
+      'allows stepping to the next record': (test) ->
+        test.expect 2
+        @cursor.get true, (error, output) =>
+          test.ifError error
+          @cursor.get (error, output) ->
+            test.equal output.key.toString('utf8'), 'last'
+            test.done()
 
     each:
       'yields records on each iteration': (test) ->
