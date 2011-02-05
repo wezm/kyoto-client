@@ -398,7 +398,7 @@ db.set('incompatible', "1", function(error, output) {
 <a name="cas"></a>
 #### ◆ cas `cas(key, oval, nval, [database], callback)`
 
-Performs a compare-and-swap operation. The value is only updated if the 
+Performs a compare-and-swap operation. The value is only updated if the
 assumed existing value matches.
 
 * `key` [String] -- The key of the record
@@ -514,7 +514,7 @@ db.setBulk(records, function(error, output) {
 });
 </code></pre>
 
-<a name="removeBulk"></a>
+<a name="remove_bulk"></a>
 #### ◆ removeBulk `removeBulk(keys, [database], callback)`
 
 Remove multiple records at once.
@@ -539,7 +539,7 @@ db.setBulk(records, function(error, output) {
 });
 </code></pre>
 
-<a name="getBulk"></a>
+<a name="get_bulk"></a>
 #### ◆ getBulk `getBulk(keys, [database], callback)`
 
 Retrieve multiple records at once.
@@ -566,17 +566,88 @@ db.set('bulk1', "Bulk\tValue", function () {
 <a name="vacuum"></a>
 #### ◆ vacuum `vacuum()`
 
-TOOD
+Not yet implemented.
 
-<a name="matchPrefix"></a>
-#### ◆ matchPrefix `matchPrefix()`
+<a name="match_prefix"></a>
+#### ◆ matchPrefix `matchPrefix(prefix, [max], [database], callback)`
 
-TODO
+Returns keys matching the supplied prefix.
 
-<a name="matchRegex"></a>
-#### ◆ matchRegex `matchRegex()`
+**Note:** if 3 arguments are supplied they are assumed to be `prefix`, `max`
+and `callback`.
 
-TODO
+* `prefix` [String] -- The prefix to match keys against
+* `max` [Number] -- The maximum number of results to return. If null or less
+  than 0 then no limit is applied.
+* `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
+* `callback(error, results)` [Function] -- Callback function
+  * `error` [Error] -- Set if an error occurs, otherwise `undefined`
+  * `results` [Array] -- The matching keys
+
+##### Example
+<pre class="highlight"><code class="language-js">
+var records = {
+  bulk1: "Bulk\tValue",
+  bulk2: "Bulk Value 2",
+  test: "Value",
+  tulk: "Value"
+};
+
+db.setBulk(records, function(error, output) {
+  db.matchprefix('bulk', function(error, output) {
+    // output -> ['bulk1', 'bulk2']
+  });
+});
+
+// with a limit
+db.setBulk(this.records, function(error, output) {
+  return db.matchPrefix('bulk', 1, function(error, output) {
+    // output -> ['bulk1']
+  });
+});
+</code></pre>
+
+<a name="match_regex"></a>
+#### ◆ matchRegex `matchRegex(regex, [max], [database], callback)`
+
+Returns keys matching the supplied regular expression.
+
+**Note:** if 3 arguments are supplied they are assumed to be `prefix`, `max`
+and `callback`.
+
+* `regex` [String] -- The regex to match keys against. **Note:** It isn't
+  clear from the Kyoto Tycoon documentation what regular expression features
+  are supported. It appears from some limited testing that character ranges
+  (E.g. `[0-9]`), `.`, `*` are supported but not `+`.
+* `max` [Number] -- The maximum number of results to return. If null or less
+  than 0 then no limit is applied.
+* `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
+* `callback(error, results)` [Function] -- Callback function
+  * `error` [Error] -- Set if an error occurs, otherwise `undefined`
+  * `results` [Array] -- The matching keys
+
+##### Example
+<pre class="highlight"><code class="language-js">
+var records = {
+  bulk1: "Bulk\tValue",
+  bulk2: "Bulk Value 2",
+  test: "Value",
+  tulk: "Value"
+};
+
+db.setBulk(records, function(error, output) {
+  db.matchRegex('[0-9]', function(error, output) {
+    // output -> ['bulk1', 'bulk2']
+  });
+});
+
+// with a limit
+db.setBulk(this.records, function(error, output) {
+  return db.matchRegex('[0-9]', 1, function(error, output) {
+    // output -> ['bulk1']
+  });
+});
+</code></pre>
 
 <a name="get_cursor"></a>
 #### ◆ getCursor `getCursor([key], callback)`
@@ -587,7 +658,6 @@ records in the database.
 **TODO:** This needs to be amended to accept a database
 
 * `key` [String] -- The key to start scanning from.
-<!-- * `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`. -->
 * `callback(error, value)` [Function] -- Callback function
   * `error` [Error] -- Set if an error occurs, otherwise `undefined`
   * `cursor` [Cursor] -- A cursor starting at `key`
@@ -647,10 +717,10 @@ TODO
 
 
 
-<a name="cur_stepBack"></a>
+<a name="cur_step_back"></a>
 #### ◆ stepBack `stepBack()`
 
-<a name="cur_setValue"></a>
+<a name="cur_set_value"></a>
 #### ◆ setValue `setValue()`
 
 <a name="cur_remove"></a>
@@ -668,10 +738,10 @@ cursor.remove(function(error, output) {
 });
 </code></pre>
 
-<a name="cur_getKey"></a>
+<a name="cur_get_key"></a>
 #### ◆ getKey `getKey()`
 
-<a name="cur_getValue"></a>
+<a name="cur_get_value"></a>
 #### ◆ getValue `getValue()`
 
 <a name="cur_get"></a>

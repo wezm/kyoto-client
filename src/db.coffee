@@ -329,6 +329,47 @@ class DB
         results[key[1...key.length]] = value if key.length > 0 and key[0] == '_'
       callback undefined, results
 
+  _matchUsing: (procedure, pattern, args) ->
+    switch args.length
+      when 1 then callback = args[0]
+      when 2
+        max      = args[0]
+        callback = args[1]
+      when 3
+        max      = args[0]
+        database = args[2]
+        callback = args[1]
+      else
+        throw new Error("Invalid number of arguments (#{args.length}) to #{procedure}");
+
+    rpc_args = {}
+    if procedure == 'match_prefix'
+      rpc_args.prefix = pattern
+    else
+      rpc_args.regex = pattern
+    rpc_args.DB = database if database?
+    rpc_args.max = max if max?
+
+    RpcClient.call @client, procedure, rpc_args, (error, status, output) ->
+      if error?
+        return callback error, output
+      else if status != 200
+        error = new Error("Unexpected response from server: #{status}")
+        return callback error, output
+
+      results = []
+      for key, value of output
+        results.push(key[1...key.length]) if key.length > 0 and key[0] == '_'
+      callback undefined, results
+
+  # prefix, [max], [database], callback
+  matchPrefix: (prefix, args...) ->
+    this._matchUsing 'match_prefix', prefix, args
+
+  # regex, [max], [database], callback
+  matchRegex: (regex, args...) ->
+    this._matchUsing 'match_regex', regex, args
+
   # [key], callback
   getCursor: (args...) ->
     switch args.length

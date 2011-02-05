@@ -269,3 +269,62 @@ module.exports =
             test.equal results.bulk1, "Bulk\tValue"
             test.ok not results.hasOwnProperty 'bulk3'
             test.done()
+
+  matchPrefix: testCase
+    setUp: (callback) ->
+      @records =
+        bulk1: "Bulk\tValue"
+        bulk2: "Bulk Value 2"
+        test: "Value"
+      dbClear(callback)
+
+    'returns matching records': (test) ->
+      test.expect 3
+      db.setBulk @records, (error, output) ->
+        test.equal output.num, '3'
+        db.matchPrefix 'bulk', (error, output) ->
+          test.ifError error
+          test.deepEqual output, [
+            'bulk1',
+            'bulk2'
+          ]
+          test.done()
+
+    'allows the number of results to be limited': (test) ->
+      test.expect 3
+      db.setBulk @records, (error, output) ->
+        test.equal output.num, '3'
+        db.matchPrefix 'bulk', 1, (error, output) ->
+          test.ifError error
+          test.deepEqual output, [ 'bulk1' ]
+          test.done()
+
+  matchRegex: testCase
+    setUp: (callback) ->
+      @records =
+        bulk1: "Bulk\tValue"
+        bulk2: "Bulk Value 2"
+        test: "Value"
+        tulk: "Value"
+      dbClear(callback)
+
+    'returns matching records': (test) ->
+      test.expect 3
+      db.setBulk @records, (error, output) ->
+        test.equal output.num, '4'
+        db.matchRegex '[0-9]', (error, output) ->
+          test.ifError error
+          test.deepEqual output, [
+            'bulk1',
+            'bulk2'
+          ]
+          test.done()
+
+    'allows the number of results to be limited': (test) ->
+      test.expect 3
+      db.setBulk @records, (error, output) ->
+        test.equal output.num, '4'
+        db.matchRegex '[0-9]', 1, (error, output) ->
+          test.ifError error
+          test.deepEqual output, [ 'bulk1' ]
+          test.done()
