@@ -8,23 +8,46 @@ title: kyoto-client - Kyoto Tycoon client for node.js
 Introduction
 ------------
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+kyoto-client is a [node.js][node] module that acts as a client to a [Kyoto
+Tycoon][kyoto] server. Kyoto Tycoon is the server component of [Kyoto
+Cabinet][cabinet], a fast, efficient key-value store developed by [FAL
+labs][fallabs]. Records can be stored on disk or in memory using a hash table
+or B+ tree.
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+[node]: http://nodejs.org/
+[kyoto]: http://fallabs.com/kyototycoon/
+[cabinet]: http://fallabs.com/kyotocabinet/
+[fallabs]: http://fallabs.com/
 
 <a name="development"></a>
 Development
 ------------
+
+kyoto-client is implemented in [CoffeeScript][coffee] and uses [nodeunit] for
+testing. Both are available via npm as `coffee-script` and `nodeunit`
+respectfully. It is developed against the current stable node.js version.
+
+The primary documentation for the project is its website, the source of which
+is also included here. The website is built with [nanoc]. To get setup for
+making documentation changes you'll need to install nanoc and some other
+RubyGems:
+
+* From the [doc] directory run `bundle install` (assumes you have previously
+  installed [bundler]).
+* Start the nanoc autocompiler with `bundle exec nanoc aco` and navigate to
+  [http://localhost:3000/](http://localhost:3000/).
+
+[nanoc]: http://nanoc.stoneship.org/
+[bundler]: http://gembundler.com/
+[doc]: https://github.com/wezm/kyoto-client/tree/master/doc
+
+Contributions are welcome and should maintain the existing coding style and be
+accompanied by tests and documentation. Bugs and desired features are tracked
+in the [issue tracker][issues]. The tests can be run via `cake test`.
+
+[coffee]: http://jashkenas.github.com/coffee-script/
+[nodeunit]: https://github.com/caolan/nodeunit
+[issues]: https://github.com/wezm/kyoto-client/issues
 
 <a name="licence"></a>
 Licence

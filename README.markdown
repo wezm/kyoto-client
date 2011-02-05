@@ -59,7 +59,7 @@ RubyGems:
 
 Contributions are welcome and should maintain the existing coding style and be
 accompanied by tests and documentation. Bugs and desired features are tracked
-in the [issue tracker][issues].
+in the [issue tracker][issues]. The tests can be run via `cake test`.
 
 [coffee]: http://jashkenas.github.com/coffee-script/
 [nodeunit]: https://github.com/caolan/nodeunit
