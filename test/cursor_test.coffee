@@ -15,17 +15,17 @@ module.exports =
       db.clear (error, output) =>
         db.set 'cursor-test', "Cursor\tValue", (error) =>
           db.getCursor (error, cursor) =>
-            this.cursor = cursor
+            @cursor = cursor
             callback()
 
     tearDown: (callback) ->
-      this.cursor.delete()
+      @cursor.delete()
       callback()
 
     get:
       'returns the key and value': (test) ->
         test.expect 2
-        this.cursor.get (error, output) ->
+        @cursor.get (error, output) ->
           test.equal output.key.toString('utf8'), "cursor-test"
           test.equal output.value.toString('utf8'), "Cursor\tValue"
           test.done()
@@ -33,7 +33,7 @@ module.exports =
     remove:
       'removes the record': (test) ->
         test.expect 2
-        this.cursor.remove (error, output) ->
+        @cursor.remove (error, output) ->
           test.ifError error
 
           db.get 'cursor-test', (error, value) ->
@@ -46,8 +46,8 @@ module.exports =
         results = []
 
         runTest = =>
-          this.cursor.jump (error) =>
-            this.cursor.each (error, output) ->
+          @cursor.jump (error) =>
+            @cursor.each (error, output) ->
               if output.key?
                 results.push [output.key, output.value]
               else
@@ -65,28 +65,65 @@ module.exports =
 
   'Cursor without a starting key': testCase
     setUp: (callback) ->
+      @records =
+        'first': "Cursor\tValue"
+        'last': "At the end"
       db.clear (error, output) =>
-        db.set 'cursor-test', "Cursor\tValue", (error) =>
+        db.setBulk @records, (error) =>
           db.getCursor 'cursor-test', (error, cursor) =>
-            this.cursor = cursor
+            @cursor = cursor
             callback()
 
     tearDown: (callback) ->
-      this.cursor.delete()
+      @cursor.delete()
       callback()
+
+    jump:
+      'allows traversal from the first record': (test) ->
+        test.expect 2
+        @cursor.jump (error, output) =>
+          test.ifError error
+          @cursor.get (error, output) ->
+            test.equal output.key.toString('utf8'), "first"
+            test.done()
+
+      'step goes to the next record': (test) ->
+        test.expect 1
+        @cursor.jump (error, output) =>
+          @cursor.step (error, output) =>
+            @cursor.get (error, output) ->
+              test.equal output.key.toString('utf8'), "last"
+              test.done()
+
+    jumpBack:
+      'allows traversal from the last record': (test) ->
+        test.expect 2
+        @cursor.jumpBack (error, output) =>
+          test.ifError error
+          @cursor.get (error, output) ->
+            test.equal output.key.toString('utf8'), "last"
+            test.done()
+
+      'stepBack goes to the previous record': (test) ->
+        test.expect 1
+        @cursor.jumpBack (error, output) =>
+          @cursor.stepBack (error, output) =>
+            @cursor.get (error, output) ->
+              test.equal output.key.toString('utf8'), "first"
+              test.done()
 
     get:
       'returns the key and value': (test) ->
         test.expect 2
-        this.cursor.get (error, output) ->
-          test.equal output.key.toString('utf8'), "cursor-test"
+        @cursor.get (error, output) ->
+          test.equal output.key.toString('utf8'), "first"
           test.equal output.value.toString('utf8'), "Cursor\tValue"
           test.done()
 
     remove:
       'removes the record': (test) ->
         test.expect 2
-        this.cursor.remove (error, output) ->
+        @cursor.remove (error, output) ->
           test.ifError error
 
           db.get 'cursor-test', (error, value) ->
@@ -99,15 +136,16 @@ module.exports =
         results = []
 
         runTest = =>
-          this.cursor.jump '1', (error) =>
-            this.cursor.each (error, output) ->
+          @cursor.jump '1', (error) =>
+            @cursor.each (error, output) ->
               if output.key?
                 results.push [output.key, output.value]
               else
                 test.deepEqual [
                     [ '1', 'One' ]
                     [ '2', 'Two' ]
-                    [ 'cursor-test', 'Cursor\tValue' ]
+                    [ 'first', 'Cursor\tValue' ]
+                    [ 'last', 'At the end' ]
                   ],
                   results
                 test.done()

@@ -12,7 +12,7 @@ class Cursor
     @client = http.createClient(@db.port, @db.host)
     this
 
-  jump: (args...) ->
+  _jumpUsing: (procedure, args) ->
     switch args.length
       when 1 then callback = args[0]
       when 2
@@ -23,13 +23,36 @@ class Cursor
         database = args[1]
         callback = args[2]
       else
-        throw new Error("Invalid number of arguments (#{args.length}) to jump");
+        throw new Error("Invalid number of arguments (#{args.length}) to #{procedure}");
 
     rpc_args = {CUR: 1}
     rpc_args.key = key if key?
     rpc_args.DB = database if database?
 
-    RpcClient.call @client, 'cur_jump', rpc_args, (error, status, output) ->
+    RpcClient.call @client, procedure, rpc_args, (error, status, output) ->
+      if error?
+        callback error, output
+      else if status == 200
+        callback undefined, output
+      else if status == 450
+        callback new Error("Cursor has been invalidated"), output
+      else if status == 501
+        callback new Error("#{procedure} is not supported by this database type"), output
+      else
+        callback new Error("Unexpected response from server: #{status}"), output
+
+  jump: (args...) ->
+    this._jumpUsing 'cur_jump', args
+
+  jumpBack: (args...) ->
+    this._jumpUsing 'cur_jump_back', args
+
+  _stepUsing: (procedure, callback) ->
+    rpc_args = {CUR: 1}
+    rpc_args.key = key if key?
+    rpc_args.DB = database if database?
+
+    RpcClient.call @client, procedure, rpc_args, (error, status, output) ->
       if error?
         callback error, output
       else if status == 200
@@ -39,13 +62,13 @@ class Cursor
       else
         callback new Error("Unexpected response from server: #{status}"), output
 
-  jumpBack: () ->
+  step: (callback) ->
+    this._stepUsing 'cur_step', callback
 
-  step: () ->
+  stepBack: (callback) ->
+    this._stepUsing 'cur_step_back', callback
 
-  stepBack: () ->
-
-  setValue: (value) ->
+  setValue: (value, callback) ->
 
   # Remove the current cursor value
   remove: (callback) ->

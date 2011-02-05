@@ -618,7 +618,7 @@ and `callback`.
 * `regex` [String] -- The regex to match keys against. **Note:** It isn't
   clear from the Kyoto Tycoon documentation what regular expression features
   are supported. It appears from some limited testing that character ranges
-  (E.g. `[0-9]`), `.`, `*` are supported but not `+`.
+  (E.g. `[0-9]`), `'.'`, `'*'` are supported but not `'+'`.
 * `max` [Number] -- The maximum number of results to return. If null or less
   than 0 then no limit is applied.
 * `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
@@ -691,7 +691,7 @@ specified.
 * `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
 * `callback(error, value)` [Function] -- Callback function
   * `error` [Error] -- Set if an error occurs, otherwise `undefined`
-  * `output` [Cursor] -- Key-value pairs
+  * `output` [Object] -- Key-value pairs
 
 ##### Example
 <pre class="highlight"><code class="language-js">
@@ -710,15 +710,60 @@ cursor.jump('test', function(error, output) {
 Jump the cursor to the specified record or the last record if no key is
 specified.
 
-TODO
+* `key` [String] -- The key to start scanning from.
+* `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
+* `callback(error, value)` [Function] -- Callback function
+  * `error` [Error] -- Set if an error occurs, otherwise `undefined`
+  * `output` [Object] -- Key-value pairs
+
+##### Example
+<pre class="highlight"><code class="language-js">
+// Jump to first record
+cursor.jump(function(error, output) {
+});
+
+// Jump to a specific record
+cursor.jump('test', function(error, output) {
+});
+</code></pre>
 
 <a name="cur_step"></a>
-#### ◆ step `step()`
+#### ◆ step `step(callback)`
 
+Steps the cursor to the next record.
 
+* `callback(error, value)` [Function] -- Callback function
+  * `error` [Error] -- Set if an error occurs, otherwise `undefined`
+  * `output` [Object] -- Key-value pairs
+
+##### Example
+<pre class="highlight"><code class="language-js">
+// Jump to first record
+cursor.jump(function(error, output) {
+  cursor.step(function(error, output) {
+    // cursor is now on the second record
+  });
+});
+</code></pre>
 
 <a name="cur_step_back"></a>
 #### ◆ stepBack `stepBack()`
+
+Steps the cursor to the previous record.
+
+* `callback(error, value)` [Function] -- Callback function
+  * `error` [Error] -- Set if an error occurs, otherwise `undefined`
+  * `output` [Object] -- Key-value pairs
+
+##### Example
+<pre class="highlight"><code class="language-js">
+// Jump to last record
+cursor.jumpBack(function(error, output) {
+  cursor.stepBack(function(error, output) {
+    // cursor is now on the second last record
+  });
+});
+</code></pre>
 
 <a name="cur_set_value"></a>
 #### ◆ setValue `setValue()`
