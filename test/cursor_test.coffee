@@ -42,15 +42,16 @@ module.exports =
 
     each:
       'yields records on each iteration': (test) ->
-        test.expect 1
-        results = []
+        test.expect 2
 
         runTest = =>
+          results = []
           @cursor.jump (error) =>
             @cursor.each (error, output) ->
               if output.key?
                 results.push [output.key, output.value]
               else
+                test.ifError error
                 test.deepEqual [
                     [ '1', 'One' ]
                     [ '2', 'Two' ]
@@ -187,15 +188,16 @@ module.exports =
 
     each:
       'yields records on each iteration': (test) ->
-        test.expect 1
-        results = []
+        test.expect 2
 
         runTest = =>
+          results = []
           @cursor.jump '1', (error) =>
             @cursor.each (error, output) ->
               if output.key?
                 results.push [output.key, output.value]
               else
+                test.ifError error
                 test.deepEqual [
                     [ '1', 'One' ]
                     [ '2', 'Two' ]

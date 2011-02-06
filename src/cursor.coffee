@@ -35,7 +35,8 @@ class Cursor
       else if status == 200
         callback undefined, output
       else if status == 450
-        callback new Error("Cursor has been invalidated"), output
+        message = output.ERROR or "Cursor has been invalidated"
+        callback new Error(message), output
       else if status == 501
         callback new Error("#{procedure} is not supported by this database type"), output
       else
@@ -119,7 +120,7 @@ class Cursor
       else if status == 200
         callback undefined, output
       else if status == 450
-        callback new Error("Cursor has been invalidated"), output
+        callback undefined, {}
       else
         callback new Error("Unexpected response from server: #{status}"), output
 
@@ -142,11 +143,9 @@ class Cursor
       this.get true, (error, output) =>
         if error
           callback error, output
-        else if output != null
-          callback undefined, output
-          this.each(callback)
-        else
-          callback undefined, null
+
+        callback undefined, output
+        this.each(callback) if output.key?
 
   delete: (callback) ->
     request = @client.request 'GET', '/rpc/cur_delete?CUR=1',

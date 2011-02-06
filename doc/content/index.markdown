@@ -681,7 +681,7 @@ records in the database.
 **TODO:** This needs to be amended to accept a database
 
 * `key` [String] -- The key to start scanning from.
-* `callback(error, value)` [Function] -- Callback function
+* `callback(error, cursor)` [Function] -- Callback function
   * `error` [Error] -- Set if an error occurs, otherwise `undefined`
   * `cursor` [Cursor] -- A cursor starting at `key`
 
@@ -836,7 +836,8 @@ Get the key of the current record.
 * `callback(error, value)` [Function] -- Callback function
   * `error` [Error] -- Set if an error occurs, otherwise `undefined`
   * `output` [Object] -- Result from the server
-    * `key` -- The key of the current record
+    * `key` -- The key of the current record. Absent if the cursor has stepped
+      past the last record.
 
 ##### Example
 <pre class="highlight"><code class="language-js">
@@ -854,7 +855,8 @@ Get the value of the current record.
 * `callback(error, value)` [Function] -- Callback function
   * `error` [Error] -- Set if an error occurs, otherwise `undefined`
   * `output` [Object] -- Result from the server
-    * `value` -- The value of the current record
+    * `value` -- The value of the current record. Absent if the cursor has stepped
+      past the last record.
 
 ##### Example
 <pre class="highlight"><code class="language-js">
@@ -871,7 +873,8 @@ Get the key and value of the current record.
 * `step` [Boolean] -- When `true` step the cursor to the next record.
 * `callback(error, value)` [Function] -- Callback function
   * `error` [Error] -- Set if an error occurs, otherwise `undefined`
-  * `output` [Object] -- Result from the server
+  * `output` [Object] -- Result from the server, empty if the cursor has
+    stepped past the last record.
     * `key` -- The key of the current record
     * `value` -- The value of the current record
 
