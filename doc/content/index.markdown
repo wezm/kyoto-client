@@ -19,6 +19,16 @@ or B+ tree.
 [cabinet]: http://fallabs.com/kyotocabinet/
 [fallabs]: http://fallabs.com/
 
+<a name="install"></a>
+Installation
+------------
+
+Installation via [npm] is recommended:
+
+    npm install kyoto-client
+
+[npm]: http://npmjs.org/
+
 <a name="development"></a>
 Development
 ------------
