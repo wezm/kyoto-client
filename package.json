@@ -1,0 +1,58 @@
+{
+  "name": "kyoto-client",
+  "version": "0.1.0",
+  "description": "Client for Kyoto Tycoon",
+  "homepage": "http://kyoto-client.org/",
+  "author": "Wesley Moore <wes@wezm.net> (http://www.wezm.net/)",
+  "keywords": [
+    "kyoto",
+    "tycoon",
+    "client",
+    "cabinet",
+    "nosql",
+    "database",
+    "datastore"
+  ],
+  "directories": {
+    "lib": "./lib",
+  },
+  "files": [
+    "README.markdown",
+    "Cakefile",
+    "LICENSE",
+    "src",
+    "test",
+    "doc",
+    "lib",
+    "package.json"
+  ],
+  "scripts": {
+    "build": "cake build",
+    "test": "cake test"
+  },
+  "engines": {
+    "node": ">=0.2.5"
+  },
+  "dependencies": {
+    "base64": "~1.0.0",
+    "csv": "~0.0.3"
+  },
+  "devDependencies": {
+    "coffee-script": "~ 1.0.0",
+    "nodeunit": "~ 0.5.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/wezm/kyoto-client.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wezm/kyoto-client/issues"
+  },
+  "licenses": [
+    {
+      "type": "BSD",
+      "url": "https://github.com/wezm/kyoto-client/raw/master/LICENSE"
+    }
+  ],
+  "main": "lib/index.js"
+}
