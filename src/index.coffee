@@ -1,5 +1,5 @@
 exports.Db = require './db'
-exports.version = '0.1.0'
+exports.version = '0.1.1'
 
 if not module.parent
   console.log exports.version
