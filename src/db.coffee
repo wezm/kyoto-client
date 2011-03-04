@@ -95,7 +95,7 @@ class DB
       else
         throw new Error("Invalid number of arguments (#{args.length}) to set");
 
-    @restClient.put @client, key, value, (error) ->
+    @restClient.put key, value, (error) ->
       callback error
 
   # Add a record if it doesn't already exist

@@ -31,9 +31,13 @@ class RESTClient
           when 200 then callback undefined, value
           when 404 then callback undefined, null
           else callback new Error("Unexpected response from server: #{response.statusCode}")
+    .on 'error', (error) ->
+      callback error
 
   head: (key, callback) ->
     options =
+      host: @host
+      port: @port
       method: 'HEAD',
       path: "/#{escape(key)}",
       headers:
@@ -48,17 +52,24 @@ class RESTClient
           else callback new Error("Unexpected response from server: #{response.statusCode}")
     request.end()
 
-  put: (client, key, value, callback) ->
-    request = client.request 'PUT', "/#{escape(key)}",
-      'Content-Length': value.length
-      'Connection': 'keep-alive '
-    request.end(value)
+  put: (key, value, callback) ->
+    options =
+      host: @host
+      port: @port
+      method: 'PUT',
+      path: "/#{escape(key)}",
+      headers:
+        'Content-Length': value.length
+        'Connection': 'keep-alive'
 
-    request.on 'response', (response) ->
+    http.request options, (response) ->
       response.on 'end', ->
         switch response.statusCode
           when 201 then callback()
           else callback new Error("Unexpected response from server: #{response.statusCode}")
+    .on 'error', (error) ->
+      callback error
+    .end(value)
 
   delete: (client, key, callback) ->
     request = client.request 'DELETE', "/#{escape(key)}",
