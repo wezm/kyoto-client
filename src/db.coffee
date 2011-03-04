@@ -12,6 +12,7 @@ class DB
 
   open: (@host = 'localhost', @port = 1978) ->
     @client = http.createClient(@port, @host)
+    @restClient = new RestClient(@port, @host)
     this
 
   close: (callback) ->
@@ -94,7 +95,7 @@ class DB
       else
         throw new Error("Invalid number of arguments (#{args.length}) to set");
 
-    RestClient.put @client, key, value, (error) ->
+    @restClient.put @client, key, value, (error) ->
       callback error
 
   # Add a record if it doesn't already exist
@@ -246,7 +247,7 @@ class DB
       else
         throw new Error("Invalid number of arguments (#{args.length}) to remove");
 
-    RestClient.delete @client, key, (error) ->
+    @restClient.delete @client, key, (error) ->
       callback error
 
   # key, [database], callback
@@ -259,7 +260,7 @@ class DB
       else
         throw new Error("Invalid number of arguments (#{args.length}) to get");
 
-    RestClient.get @client, key, (error, value) ->
+    @restClient.get key, (error, value) ->
       callback error, value
 
   setBulk: (records, args...) ->

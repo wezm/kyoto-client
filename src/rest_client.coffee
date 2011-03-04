@@ -1,12 +1,20 @@
-# Manages an REST style request
-module.exports =
-  get: (client, key, callback) ->
-    request = client.request 'GET', "/#{escape(key)}",
-      'Content-Length': 0
-      'Connection': 'keep-alive'
-    request.end()
+http = require 'http'
 
-    request.on 'response', (response) ->
+# Manages REST style requests
+class RESTClient
+  constructor: (@port, @host) ->
+    this
+
+  get: (key, callback) ->
+    request =
+      host: @host
+      port: @port
+      path: "/#{escape(key)}",
+      headers:
+        'Content-Length': 0
+        'Connection': 'keep-alive'
+
+    http.get request, (response) ->
       # The whole response body will be buffered in memory
       # if large responses are expected it would be
       # better to write to a file if over some size threshold.
@@ -61,3 +69,5 @@ module.exports =
           when 204 then callback()
           when 404 then callback new Error("Record not found")
           else callback new Error("Unexpected response from server: #{response.statusCode}")
+
+module.exports = RESTClient
