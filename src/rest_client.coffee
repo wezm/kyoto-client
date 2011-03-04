@@ -1,7 +1,7 @@
 http = require 'http'
 
 # Manages REST style requests
-class RESTClient
+class RestClient
   constructor: (@port, @host) ->
     this
 
@@ -93,4 +93,4 @@ class RESTClient
       callback error
     .end()
 
-module.exports = RESTClient
+module.exports = RestClient
