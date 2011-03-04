@@ -14,7 +14,7 @@
     "datastore"
   ],
   "directories": {
-    "lib": "./lib",
+    "lib": "./lib"
   },
   "files": [
     "README.markdown",
