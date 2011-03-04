@@ -19,8 +19,8 @@ module.exports =
             callback()
 
     tearDown: (callback) ->
-      @cursor.delete()
-      callback()
+      @cursor.delete ->
+        callback()
 
     get:
       'returns the key and value': (test) ->
@@ -76,8 +76,8 @@ module.exports =
             callback()
 
     tearDown: (callback) ->
-      @cursor.delete()
-      callback()
+      @cursor.delete ->
+        callback()
 
     jump:
       'allows traversal from the first record': (test) ->

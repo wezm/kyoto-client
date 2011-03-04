@@ -9,7 +9,7 @@ class Cursor
   constructor: (@db) ->
     # Cursors have their own client so that the cursor id can be the same
     # for each one
-    @client = http.createClient(@db.port, @db.host)
+    @client = new RpcClient(@db.port, @db.host)
     this
 
   _jumpUsing: (procedure, args) ->
@@ -29,7 +29,7 @@ class Cursor
     rpc_args.key = key if key?
     rpc_args.DB = database if database?
 
-    RpcClient.call @client, procedure, rpc_args, (error, status, output) ->
+    @client.call procedure, rpc_args, (error, status, output) ->
       if error?
         callback error, output
       else if status == 200
@@ -52,7 +52,7 @@ class Cursor
     rpc_args = {CUR: 1}
     rpc_args.key = key if key?
 
-    RpcClient.call @client, procedure, rpc_args, (error, status, output) ->
+    @client.call procedure, rpc_args, (error, status, output) ->
       if error?
         callback error, output
       else if status == 200
@@ -80,7 +80,7 @@ class Cursor
     rpc_args = {CUR: 1, value: value}
     rpc_args.step = 1 if step?
 
-    RpcClient.call @client, 'cur_set_value', rpc_args, (error, status, output) ->
+    @client.call 'cur_set_value', rpc_args, (error, status, output) ->
       if error?
         callback error, output
       else if status == 200
@@ -93,7 +93,7 @@ class Cursor
   # Remove the current cursor value
   remove: (callback) ->
     rpc_args = {CUR: 1}
-    RpcClient.call @client, 'cur_remove', rpc_args, (error, status, output) ->
+    @client.call 'cur_remove', rpc_args, (error, status, output) ->
       if error?
         callback error, output
       else if status == 200
@@ -114,7 +114,7 @@ class Cursor
 
     rpc_args = {CUR: 1}
     rpc_args.step = 1 if step?
-    RpcClient.call @client, procedure, rpc_args, (error, status, output) ->
+    @client.call procedure, rpc_args, (error, status, output) ->
       if error?
         callback error, output
       else if status == 200
@@ -148,11 +148,18 @@ class Cursor
         this.each(callback) if output.key?
 
   delete: (callback) ->
-    request = @client.request 'GET', '/rpc/cur_delete?CUR=1',
-      'Connection': 'close'
-    request.end()
+    request =
+      host: @db.host
+      port: @db.port
+      path: '/rpc/cur_delete?CUR=1'
+      headers:
+        'Connection': 'close'
+    assert.ok callback, "you must supply a callback"
 
-    request.on 'end', ->
-      callback()
+    http.get request, (response) =>
+      response.on 'end', =>
+        callback()
+    .on 'error', (error) ->
+      callback(error)
 
 module.exports = Cursor

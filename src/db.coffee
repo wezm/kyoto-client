@@ -11,7 +11,7 @@ class DB
   #   # not sure we need to do anything here
 
   open: (@host = 'localhost', @port = 1978) ->
-    @client = http.createClient(@port, @host)
+    @rpcClient = new RpcClient(@port, @host)
     @restClient = new RestClient(@port, @host)
     this
 
@@ -25,7 +25,7 @@ class DB
       callback()
 
   echo: (input, callback) ->
-    RpcClient.call @client, 'echo', input, (error, status, output) ->
+    @rpcClient.call 'echo', input, (error, status, output) ->
       if error?
         callback error, output
       else if status != 200
@@ -35,7 +35,7 @@ class DB
         callback undefined, output
 
   report: (callback) ->
-    RpcClient.call @client, 'report', {}, (error, status, output) ->
+    @rpcClient.call 'report', {}, (error, status, output) ->
       if error?
         callback error, output
       else if status != 200
@@ -55,7 +55,7 @@ class DB
 
     rpc_args = {}
     rpc_args.DB = database if database?
-    RpcClient.call @client, 'status', rpc_args, (error, status, output) ->
+    @rpcClient.call 'status', rpc_args, (error, status, output) ->
       if error?
         callback error, output
       else if status != 200
@@ -76,7 +76,7 @@ class DB
 
     rpc_args = {}
     rpc_args.DB = database if database?
-    RpcClient.call @client, 'clear', rpc_args, (error, status, output) ->
+    @rpcClient.call 'clear', rpc_args, (error, status, output) ->
       if error?
         callback error, output
       else if status != 200
@@ -112,7 +112,7 @@ class DB
       key: key
       value: value
     rpc_args.DB = database if database?
-    RpcClient.call @client, 'add', rpc_args, (error, status, output) ->
+    @rpcClient.call 'add', rpc_args, (error, status, output) ->
       if error?
         callback error, output
       else if status == 200
@@ -136,7 +136,7 @@ class DB
       key: key
       value: value
     rpc_args.DB = database if database?
-    RpcClient.call @client, 'replace', rpc_args, (error, status, output) ->
+    @rpcClient.call 'replace', rpc_args, (error, status, output) ->
       if error?
         callback error, output
       else if status == 200
@@ -159,7 +159,7 @@ class DB
       key: key
       value: value
     rpc_args.DB = database if database?
-    RpcClient.call @client, 'append', rpc_args, (error, status, output) ->
+    @rpcClient.call 'append', rpc_args, (error, status, output) ->
       if error?
         callback error, output
       else if status != 200
@@ -181,7 +181,7 @@ class DB
       key: key
       num: num
     rpc_args.DB = database if database?
-    RpcClient.call @client, 'increment', rpc_args, (error, status, output) ->
+    @rpcClient.call 'increment', rpc_args, (error, status, output) ->
       if error?
         callback error, output
       else if status == 200
@@ -204,7 +204,7 @@ class DB
       key: key
       num: num
     rpc_args.DB = database if database?
-    RpcClient.call @client, 'increment_double', rpc_args, (error, status, output) ->
+    @rpcClient.call 'increment_double', rpc_args, (error, status, output) ->
       if error?
         callback error, output
       else if status == 200
@@ -228,7 +228,7 @@ class DB
       oval: oval
     rpc_args.nval = nval if nval?
     rpc_args.DB = database if database?
-    RpcClient.call @client, 'cas', rpc_args, (error, status, output) ->
+    @rpcClient.call 'cas', rpc_args, (error, status, output) ->
       if error?
         callback error, output
       else if status == 200
@@ -276,7 +276,7 @@ class DB
     rpc_args.DB = database if database?
     rpc_args["_#{key}"] = value for key, value of records
 
-    RpcClient.call @client, 'set_bulk', rpc_args, (error, status, output) ->
+    @rpcClient.call 'set_bulk', rpc_args, (error, status, output) ->
       if error?
         callback error, output
       else if status == 200
@@ -297,7 +297,7 @@ class DB
     rpc_args.DB = database if database?
     rpc_args["_#{key}"] = '' for key, value of records
 
-    RpcClient.call @client, 'remove_bulk', rpc_args, (error, status, output) ->
+    @rpcClient.call 'remove_bulk', rpc_args, (error, status, output) ->
       if error?
         callback error, output
       else if status == 200
@@ -318,7 +318,7 @@ class DB
     rpc_args.DB = database if database?
     rpc_args["_#{key}"] = '' for key in keys
 
-    RpcClient.call @client, 'get_bulk', rpc_args, (error, status, output) ->
+    @rpcClient.call 'get_bulk', rpc_args, (error, status, output) ->
       if error?
         return callback error, output
       else if status != 200
@@ -351,7 +351,7 @@ class DB
     rpc_args.DB = database if database?
     rpc_args.max = max if max?
 
-    RpcClient.call @client, procedure, rpc_args, (error, status, output) ->
+    @rpcClient.call procedure, rpc_args, (error, status, output) ->
       if error?
         return callback error, output
       else if status != 200
