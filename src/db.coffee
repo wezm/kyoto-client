@@ -247,7 +247,7 @@ class DB
       else
         throw new Error("Invalid number of arguments (#{args.length}) to remove");
 
-    @restClient.delete @client, key, (error) ->
+    @restClient.delete key, (error) ->
       callback error
 
   # key, [database], callback

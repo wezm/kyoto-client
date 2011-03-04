@@ -9,7 +9,7 @@ class RESTClient
     request =
       host: @host
       port: @port
-      path: "/#{escape(key)}",
+      path: "/#{escape(key)}"
       headers:
         'Content-Length': 0
         'Connection': 'keep-alive'
@@ -38,26 +38,28 @@ class RESTClient
     options =
       host: @host
       port: @port
-      method: 'HEAD',
-      path: "/#{escape(key)}",
+      method: 'HEAD'
+      path: "/#{escape(key)}"
       headers:
         'Content-Length': 0
         'Connection': 'keep-alive'
 
-    request = http.request options, (response) ->
+    http.request options, (response) ->
       response.on 'end', ->
         switch response.statusCode
           when 200 then callback undefined, response.headers
           when 404 then callback undefined, null
           else callback new Error("Unexpected response from server: #{response.statusCode}")
-    request.end()
+    .on 'error', (error) ->
+      callback error
+    .end()
 
   put: (key, value, callback) ->
     options =
       host: @host
       port: @port
-      method: 'PUT',
-      path: "/#{escape(key)}",
+      method: 'PUT'
+      path: "/#{escape(key)}"
       headers:
         'Content-Length': value.length
         'Connection': 'keep-alive'
@@ -71,17 +73,24 @@ class RESTClient
       callback error
     .end(value)
 
-  delete: (client, key, callback) ->
-    request = client.request 'DELETE', "/#{escape(key)}",
-      'Content-Length': 0
-      'Connection': 'keep-alive'
-    request.end()
+  delete: (key, callback) ->
+    options =
+      host: @host
+      port: @port
+      method: 'DELETE'
+      path: "/#{escape(key)}"
+      headers:
+        'Content-Length': 0
+        'Connection': 'keep-alive'
 
-    request.on 'response', (response) ->
+    http.request options, (response) ->
       response.on 'end', ->
         switch response.statusCode
           when 204 then callback()
           when 404 then callback new Error("Record not found")
           else callback new Error("Unexpected response from server: #{response.statusCode}")
+    .on 'error', (error) ->
+      callback error
+    .end()
 
 module.exports = RESTClient
