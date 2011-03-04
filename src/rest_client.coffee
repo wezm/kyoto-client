@@ -32,18 +32,21 @@ class RESTClient
           when 404 then callback undefined, null
           else callback new Error("Unexpected response from server: #{response.statusCode}")
 
-  head: (client, key, callback) ->
-    request = client.request 'HEAD', "/#{escape(key)}",
-      'Content-Length': 0
-      'Connection': 'keep-alive'
-    request.end()
+  head: (key, callback) ->
+    options =
+      method: 'HEAD',
+      path: "/#{escape(key)}",
+      headers:
+        'Content-Length': 0
+        'Connection': 'keep-alive'
 
-    request.on 'response', (response) ->
+    request = http.request options, (response) ->
       response.on 'end', ->
         switch response.statusCode
           when 200 then callback undefined, response.headers
           when 404 then callback undefined, null
           else callback new Error("Unexpected response from server: #{response.statusCode}")
+    request.end()
 
   put: (client, key, value, callback) ->
     request = client.request 'PUT', "/#{escape(key)}",
