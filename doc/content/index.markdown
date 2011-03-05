@@ -964,6 +964,15 @@ cursor.each(function(error, output) {
 Changelog
 ---------
 
-### 0.1.0 -- <time datetime="2011-02-06">6 Feb 2011</time>
+### 0.2.0 -- <time datetime="2011-03-05">5 Mar 2011</time>
+
+* node 0.4 compatibility
+* Handle base64 encoded responses
+
+### 0.1.1 -- <time datetime="2011-02-09">9 Feb 2011</time>
+
+Some last  minute documentation additions.
+
+### 0.1.0 -- <time datetime="2011-02-09">9 Feb 2011</time>
 
 Initial release.
