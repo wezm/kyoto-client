@@ -147,6 +147,15 @@ module.exports =
             test.equal output.key.toString('utf8'), 'last'
             test.done()
 
+      'accept a Buffer as the value': (test) ->
+        test.expect 2
+        buffer = new Buffer("Some Value", 'ascii')
+        @cursor.setValue buffer, (error, output) =>
+          test.ifError error
+          @cursor.getValue (error, output) ->
+            test.equal output.value.toString('ascii'), "Some Value"
+            test.done()
+
     remove:
       'removes the record': (test) ->
         test.expect 2
