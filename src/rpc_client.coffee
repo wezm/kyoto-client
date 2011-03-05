@@ -2,6 +2,7 @@
 csv = require 'csv'
 assert = require 'assert'
 http = require 'http'
+base64 = require 'base64'
 
 class RpcClient
   constructor: (@port, @host) ->
@@ -42,8 +43,8 @@ class RpcClient
           tsv.transform (row, index) ->
             unescape(col) for col in row
         when 'B'
-        # TODO: Return a proper error
-          throw new Error("Base64 encoding is not implemented")
+          tsv.transform (row, index) ->
+            base64.decode(col) for col in row
         # Quoted-printable is never selected by the server
         # when 'Q'
         #   throw new Error("Quoted-printable encoding is not implemented")

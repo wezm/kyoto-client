@@ -1,6 +1,7 @@
 kt = require '../lib/index'
 util = require 'util'
 testCase = require('nodeunit').testCase
+fs = require 'fs'
 
 db = new kt.Db()
 db.open()
@@ -29,6 +30,22 @@ module.exports =
           test.equal output.key.toString('utf8'), "cursor-test"
           test.equal output.value.toString('utf8'), "Cursor\tValue"
           test.done()
+
+      'handles base64 encoded responses': (test) ->
+        test.expect 2
+        fs.readFile "#{__dirname}/../doc/output/favicon.ico", (error, data) =>
+          test.ifError error
+          # Storing a predompinently binary value triggers a base64 response
+          # from the server.
+          db.set 'test', data, (error) =>
+            @cursor.jump 'test', =>
+              @cursor.get (error, output) ->
+                # The base64 package returns binary strings when it decodes
+                # convert the source data to the same to make the two values
+                # comparable.
+                dataString = data.toString 'binary'
+                test.equal output.value, dataString
+                test.done()
 
     remove:
       'removes the record': (test) ->
