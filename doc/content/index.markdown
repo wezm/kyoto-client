@@ -524,6 +524,34 @@ db.get('not here', function(error, value) {
 });
 </code></pre>
 
+<a name="exists"></a>
+#### ◆ exists `exists(key, [database], callback)`
+
+Checks if a record with the specified key exists. Returns true if it does,
+false otherwise.
+
+* `key` [String] -- The key of the record
+* `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
+* `callback(error, value)` [Function] -- Callback function
+  * `error` [Error] -- Set if an error occurs, otherwise `undefined`
+  * `result` [Boolean] -- `true` if the record exists, `false` otherwise
+
+##### Example
+<pre class="highlight"><code class="language-js">
+db.set('test', "Value", function(error, output) {
+  db.exists('test', function(error, result) {
+    // error  -> undefined
+    // result -> true
+  });
+});
+
+// Non-existent record
+db.exists('not here', function(error, result) {
+  // error  -> undefined
+  // result -> false
+});
+</code></pre>
+
 <a name="set_bulk"></a>
 #### ◆ setBulk `setBulk(records, [database], callback)`
 
@@ -968,6 +996,7 @@ Changelog
 
 * node 0.4 compatibility
 * Handle base64 encoded responses
+* Add [db.exists](#exists)
 
 ### 0.1.1 -- <time datetime="2011-02-09">9 Feb 2011</time>
 

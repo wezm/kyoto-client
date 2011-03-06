@@ -230,6 +230,22 @@ module.exports =
           test.equal value, "Test\tValue"
           test.done()
 
+  exists: testCase
+    setUp: dbClear
+
+    'returns false for a non-existent key': (test) ->
+      test.expect 1
+      db.exists 'not here', (error, result) ->
+        test.equal result, false
+        test.done()
+
+    'returns true when the key exists': (test) ->
+      test.expect 1
+      db.set 'test', "Here", (error) ->
+        db.exists 'test', (error, result) ->
+          test.equal result, true
+          test.done()
+
   setBulk: testCase
     setUp: dbClear
 

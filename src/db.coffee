@@ -250,6 +250,18 @@ class DB
     @restClient.delete key, (error) ->
       callback error
 
+  exists: (key, args...) ->
+    switch args.length
+      when 1 then callback = args[0]
+      when 2
+        database = args[0]
+        callback = args[1]
+      else
+        throw new Error("Invalid number of arguments (#{args.length}) to exists");
+
+    @restClient.head key, (error, headers) ->
+      callback error, headers?
+
   # key, [database], callback
   get: (key, args...) ->
     switch args.length
