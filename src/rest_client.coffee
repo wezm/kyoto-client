@@ -5,11 +5,23 @@ class RestClient
   constructor: (@port, @host) ->
     this
 
-  get: (key, callback) ->
+  _extractArgs: (args) ->
+    switch args.length
+      when 1 then return [null, args[0]]
+      when 2 then return args
+      else
+        throw new Error("Invalid number of arguments (#{args.length})");
+
+  _buildPath: (database, key) ->
+    if database then "/#{escape(database)}/#{escape(key)}" else "/#{escape(key)}"
+
+  get: (key, args...) ->
+    [database, callback] = this._extractArgs(args)
+
     request =
       host: @host
       port: @port
-      path: "/#{escape(key)}"
+      path: this._buildPath database, key
       headers:
         'Content-Length': 0
         'Connection': 'keep-alive'
@@ -34,12 +46,14 @@ class RestClient
     .on 'error', (error) ->
       callback error
 
-  head: (key, callback) ->
+  head: (key, args...) ->
+    [database, callback] = this._extractArgs(args)
+
     options =
       host: @host
       port: @port
       method: 'HEAD'
-      path: "/#{escape(key)}"
+      path: this._buildPath database, key
       headers:
         'Content-Length': 0
         'Connection': 'keep-alive'
@@ -54,12 +68,14 @@ class RestClient
       callback error
     .end()
 
-  put: (key, value, callback) ->
+  put: (key, value, args...) ->
+    [database, callback] = this._extractArgs(args)
+
     options =
       host: @host
       port: @port
       method: 'PUT'
-      path: "/#{escape(key)}"
+      path: this._buildPath database, key
       headers:
         'Content-Length': if typeof value == 'string' then Buffer.byteLength(value) else value.length
         'Connection': 'keep-alive'
@@ -73,12 +89,14 @@ class RestClient
       callback error
     .end(value)
 
-  delete: (key, callback) ->
+  delete: (key, args...) ->
+    [database, callback] = this._extractArgs(args)
+
     options =
       host: @host
       port: @port
       method: 'DELETE'
-      path: "/#{escape(key)}"
+      path: this._buildPath database, key
       headers:
         'Content-Length': 0
         'Connection': 'keep-alive'

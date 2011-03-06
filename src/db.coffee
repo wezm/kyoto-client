@@ -104,7 +104,7 @@ class DB
       else
         throw new Error("Invalid number of arguments (#{args.length}) to set");
 
-    @restClient.put key, value, (error) ->
+    @restClient.put key, value, database, (error) ->
       callback error
 
   # Add a record if it doesn't already exist
@@ -256,7 +256,7 @@ class DB
       else
         throw new Error("Invalid number of arguments (#{args.length}) to remove");
 
-    @restClient.delete key, (error) ->
+    @restClient.delete key, database, (error) ->
       callback error
 
   exists: (key, args...) ->
@@ -268,7 +268,7 @@ class DB
       else
         throw new Error("Invalid number of arguments (#{args.length}) to exists");
 
-    @restClient.head key, (error, headers) ->
+    @restClient.head key, database, (error, headers) ->
       callback error, headers?
 
   # key, [database], callback
@@ -281,7 +281,7 @@ class DB
       else
         throw new Error("Invalid number of arguments (#{args.length}) to get");
 
-    @restClient.get key, (error, value) ->
+    @restClient.get key, database, (error, value) ->
       callback error, value
 
   setBulk: (records, args...) ->
@@ -359,8 +359,8 @@ class DB
         callback = args[1]
       when 3
         max      = args[0]
-        database = args[2]
-        callback = args[1]
+        database = args[1]
+        callback = args[2]
       else
         throw new Error("Invalid number of arguments (#{args.length}) to #{procedure}");
 

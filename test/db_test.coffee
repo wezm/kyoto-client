@@ -4,13 +4,11 @@ testCase = require('nodeunit').testCase
 
 db = new kt.Db()
 db.open()
+testDb = "test.kct"
 
 dbClear = (callback) ->
-  db.clear (error, output) ->
+  db.clear testDb, (error, output) ->
     callback()
-
-p = (item) ->
-  util.log util.inspect item
 
 module.exports =
   echo: testCase
@@ -39,7 +37,7 @@ module.exports =
 
     'returns status information about the database': (test) ->
       test.expect 2
-      db.status (error, output) ->
+      db.status testDb, (error, output) ->
         test.ok Object.keys(output).length > 0
         test.ok output.hasOwnProperty 'count'
         test.done()
@@ -52,7 +50,7 @@ module.exports =
 
     'completes without error': (test) ->
       test.expect 1
-      db.set 'test', "Test", (error, output) ->
+      db.set 'test', "Test", testDb, (error, output) ->
         test.ifError error
         test.done()
 
@@ -63,16 +61,16 @@ module.exports =
         barrier++
         if barrier == 4
           test.done()
-      db.set 'test', '\u00bd + \u00bc = \u00be', (error, output) ->
+      db.set 'test', '\u00bd + \u00bc = \u00be', testDb, (error, output) ->
         test.ifError error
         done()
-      db.set 'test2', '\u00bd + \u00bc = \u00be', (error, output) ->
+      db.set 'test2', '\u00bd + \u00bc = \u00be', testDb, (error, output) ->
         test.ifError error
         done()
-      db.set 'test3', '\u00bd + \u00bc = \u00be', (error, output) ->
+      db.set 'test3', '\u00bd + \u00bc = \u00be', testDb, (error, output) ->
         test.ifError error
         done()
-      db.set 'test4', '\u00bd + \u00bc = \u00be', (error, output) ->
+      db.set 'test4', '\u00bd + \u00bc = \u00be', testDb, (error, output) ->
         test.ifError error
         done()
 
@@ -81,14 +79,14 @@ module.exports =
 
     'completes without error when the record does not exist': (test) ->
       test.expect 1
-      db.add 'test', "Test", (error, output) ->
+      db.add 'test', "Test", testDb, (error, output) ->
         test.ifError error
         test.done()
 
     'returns an error if the record exists': (test) ->
       test.expect 2
-      db.add 'test', "Test", (error, output) ->
-        db.add 'test', "Test", (error, output) ->
+      db.add 'test', "Test", testDb, (error, output) ->
+        db.add 'test', "Test", testDb, (error, output) ->
           test.ok error?
           test.equal error.message, "Record exists"
           test.done()
@@ -98,14 +96,14 @@ module.exports =
 
     'completes without error when the record exists': (test) ->
       test.expect 1
-      db.add 'test', "Test", (error, output) ->
-        db.replace 'test', "New Value", (error, output) ->
+      db.add 'test', "Test", testDb, (error, output) ->
+        db.replace 'test', "New Value", testDb, (error, output) ->
           test.ifError error
           test.done()
 
     'returns an error if the record does not exist': (test) ->
       test.expect 2
-      db.replace 'test', "New Value", (error, output) ->
+      db.replace 'test', "New Value", testDb, (error, output) ->
         test.ok error?
         test.equal error.message, "Record does not exist"
         test.done()
@@ -115,20 +113,20 @@ module.exports =
 
     'appends to an existing value': (test) ->
       test.expect 2
-      db.set 'test', "Test", (error, output) ->
-        db.append 'test', " Value", (error, output) ->
+      db.set 'test', "Test", testDb, (error, output) ->
+        db.append 'test', " Value", testDb, (error, output) ->
           test.ifError error
 
-          db.get 'test', (error, value) ->
+          db.get 'test', testDb, (error, value) ->
             test.equal value, "Test Value"
             test.done()
 
     'sets a non-existent value': (test) ->
       test.expect 2
-      db.append 'test', "Value", (error, output) ->
+      db.append 'test', "Value", testDb, (error, output) ->
         test.ifError error
 
-        db.get 'test', (error, value) ->
+        db.get 'test', testDb, (error, value) ->
           test.equal value, "Value"
           test.done()
 
@@ -137,24 +135,24 @@ module.exports =
 
     'increments compatible records': (test) ->
       test.expect 2
-      db.increment 'inc', 1, (error, output) ->
+      db.increment 'inc', 1, testDb, (error, output) ->
         test.equal output.num, '1'
 
-        db.increment 'inc', 4, (error, output) ->
+        db.increment 'inc', 4, testDb, (error, output) ->
           test.equal output.num, '5'
           test.done()
 
     'can increment by negative values': (test) ->
       test.expect 1
-      db.increment 'inc', -5, (error, output) ->
+      db.increment 'inc', -5, testDb, (error, output) ->
         test.equal output.num, '-5'
         test.done()
 
     'returns an error if the record is incompatible': (test) ->
       # Only records set via increment appear to be manipulatable with it.
       test.expect 1
-      db.set 'inc', '1', (error, output) ->
-        db.increment 'inc', 1, (error, output) ->
+      db.set 'inc', '1', testDb, (error, output) ->
+        db.increment 'inc', 1, testDb, (error, output) ->
           test.ok error?
           test.done()
 
@@ -163,24 +161,24 @@ module.exports =
 
     'increments compatible records': (test) ->
       test.expect 2
-      db.incrementDouble 'inc', 1.5, (error, output) ->
+      db.incrementDouble 'inc', 1.5, testDb, (error, output) ->
         test.equal output.num, '1.500000'
 
-        db.incrementDouble 'inc', 4.95, (error, output) ->
+        db.incrementDouble 'inc', 4.95, testDb, (error, output) ->
           test.equal output.num, '6.450000'
           test.done()
 
     'can increment by negative values': (test) ->
       test.expect 1
-      db.incrementDouble 'inc', -1.25, (error, output) ->
+      db.incrementDouble 'inc', -1.25, testDb, (error, output) ->
         test.equal output.num, '-1.250000'
         test.done()
 
     'returns an error if the record is incompatible': (test) ->
       # Only records set via increment appear to be manipulatable with it.
       test.expect 1
-      db.set 'inc', '1.3', (error, output) ->
-        db.incrementDouble 'inc', 0.100000, (error, output) ->
+      db.set 'inc', '1.3', testDb, (error, output) ->
+        db.incrementDouble 'inc', 0.100000, testDb, (error, output) ->
           test.ok error?
           test.done()
 
@@ -189,29 +187,29 @@ module.exports =
 
     'sets the new value when the old value matches': (test) ->
       test.expect 2
-      db.set 'test', 'old', ->
-        db.cas 'test', 'old', 'new', (error, output) ->
+      db.set 'test', 'old', testDb, ->
+        db.cas 'test', 'old', 'new', testDb, (error, output) ->
           test.ifError error
-          db.get 'test', (error, value) ->
+          db.get 'test', testDb, (error, value) ->
             test.equal value, 'new'
             test.done()
 
     'doesn\'t set the new value when the old value differs': (test) ->
       test.expect 3
-      db.set 'test', 'old', ->
-        db.cas 'test', 'not old', 'new', (error, output) ->
+      db.set 'test', 'old', testDb, ->
+        db.cas 'test', 'not old', 'new', testDb, (error, output) ->
           test.ok error?
           test.equal error.message, "Record has changed"
-          db.get 'test', (error, value) ->
+          db.get 'test', testDb, (error, value) ->
             test.equal value, 'old'
             test.done()
 
     'removes the record when the new value is null': (test) ->
       test.expect 2
-      db.set 'test', 'old', ->
-        db.cas 'test', 'old', null, (error, output) ->
+      db.set 'test', 'old', testDb, ->
+        db.cas 'test', 'old', null, testDb, (error, output) ->
           test.ifError error
-          db.get 'test', (error, value) ->
+          db.get 'test', testDb, (error, value) ->
             test.equal value, null
             test.done()
 
@@ -220,16 +218,16 @@ module.exports =
 
     'removes records that exist': (test) ->
       test.expect 2
-      db.set 'test', 'old', ->
-        db.remove 'test', (error) ->
+      db.set 'test', 'old',testDb,  ->
+        db.remove 'test', testDb, (error) ->
           test.ifError error
-          db.get 'test', (error, value) ->
+          db.get 'test', testDb, (error, value) ->
             test.equal value, null
             test.done()
 
     'returns an error if the record doesn\'t exist': (test) ->
       test.expect 2
-      db.remove 'test', (error) ->
+      db.remove 'test', testDb, (error) ->
         test.ok error?
         test.equal error.message, "Record not found"
         test.done()
@@ -239,14 +237,14 @@ module.exports =
 
     'returns null for non-existent key': (test) ->
       test.expect 1
-      db.get 'test', (error, value) ->
+      db.get 'test', testDb, (error, value) ->
         test.ok value == null
         test.done()
 
     'retrieves an existing key': (test) ->
       test.expect 1
-      db.set 'test', "Test\tValue", (error) ->
-        db.get 'test', (error, value) ->
+      db.set 'test', "Test\tValue", testDb, (error) ->
+        db.get 'test', testDb, (error, value) ->
           test.equal value, "Test\tValue"
           test.done()
 
@@ -255,14 +253,14 @@ module.exports =
 
     'returns false for a non-existent key': (test) ->
       test.expect 1
-      db.exists 'not here', (error, result) ->
+      db.exists 'not here', testDb, (error, result) ->
         test.equal result, false
         test.done()
 
     'returns true when the key exists': (test) ->
       test.expect 1
-      db.set 'test', "Here", (error) ->
-        db.exists 'test', (error, result) ->
+      db.set 'test', "Here", testDb, (error) ->
+        db.exists 'test', testDb, (error, result) ->
           test.equal result, true
           test.done()
 
@@ -274,7 +272,7 @@ module.exports =
       records =
         bulk1: "Bulk\tValue"
         bulk2: "Bulk Value 2"
-      db.setBulk records, (error, output) ->
+      db.setBulk records, testDb, (error, output) ->
         test.ifError error
         test.equal output.num, '2'
         test.done()
@@ -287,9 +285,9 @@ module.exports =
       records =
         bulk1: "Bulk\tValue"
         bulk2: "Bulk Value 2"
-      db.setBulk records, (error, output) ->
+      db.setBulk records, testDb, (error, output) ->
         test.equal output.num, '2'
-        db.removeBulk records, (error, output) ->
+        db.removeBulk records, testDb, (error, output) ->
           test.ifError error
           test.equal output.num, '2'
           test.done()
@@ -299,9 +297,9 @@ module.exports =
 
     'allows multiple values to be retrieved at once': (test) ->
       test.expect 2
-      db.set 'bulk1', "Bulk\tValue", (error) ->
-        db.set 'bulk2', "Bulk Value 2", (error) ->
-          db.getBulk ['bulk1', 'bulk3'], (error, results) ->
+      db.set 'bulk1', "Bulk\tValue", testDb, (error) ->
+        db.set 'bulk2', "Bulk Value 2", testDb, (error) ->
+          db.getBulk ['bulk1', 'bulk3'], testDb, (error, results) ->
             test.equal results.bulk1, "Bulk\tValue"
             test.ok not results.hasOwnProperty 'bulk3'
             test.done()
@@ -316,9 +314,9 @@ module.exports =
 
     'returns matching records': (test) ->
       test.expect 3
-      db.setBulk @records, (error, output) ->
+      db.setBulk @records, testDb, (error, output) ->
         test.equal output.num, '3'
-        db.matchPrefix 'bulk', (error, output) ->
+        db.matchPrefix 'bulk', null, testDb, (error, output) ->
           test.ifError error
           test.deepEqual output, [
             'bulk1',
@@ -328,9 +326,9 @@ module.exports =
 
     'allows the number of results to be limited': (test) ->
       test.expect 3
-      db.setBulk @records, (error, output) ->
+      db.setBulk @records, testDb, (error, output) ->
         test.equal output.num, '3'
-        db.matchPrefix 'bulk', 1, (error, output) ->
+        db.matchPrefix 'bulk', 1, testDb, (error, output) ->
           test.ifError error
           test.deepEqual output, [ 'bulk1' ]
           test.done()
@@ -346,9 +344,9 @@ module.exports =
 
     'returns matching records': (test) ->
       test.expect 3
-      db.setBulk @records, (error, output) ->
+      db.setBulk @records, testDb, (error, output) ->
         test.equal output.num, '4'
-        db.matchRegex '[0-9]', (error, output) ->
+        db.matchRegex '[0-9]', null, testDb, (error, output) ->
           test.ifError error
           test.deepEqual output, [
             'bulk1',
@@ -358,9 +356,9 @@ module.exports =
 
     'allows the number of results to be limited': (test) ->
       test.expect 3
-      db.setBulk @records, (error, output) ->
+      db.setBulk @records, testDb, (error, output) ->
         test.equal output.num, '4'
-        db.matchRegex '[0-9]', 1, (error, output) ->
+        db.matchRegex '[0-9]', 1, testDb, (error, output) ->
           test.ifError error
           test.deepEqual output, [ 'bulk1' ]
           test.done()
