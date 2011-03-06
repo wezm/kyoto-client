@@ -143,9 +143,9 @@ class Cursor
       this.get true, (error, output) =>
         if error
           callback error, output
-
-        callback undefined, output
-        this.each(callback) if output.key?
+        else
+          callback undefined, output
+          this.each(callback) if output.key?
 
   delete: (callback) ->
     request =
