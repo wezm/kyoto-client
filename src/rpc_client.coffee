@@ -17,7 +17,7 @@ class RpcClient
       path: "/rpc/#{procedure}"
       headers:
         'Connection': 'keep-alive'
-        'Content-Length': body.length
+        'Content-Length': if typeof body == 'string' then Buffer.byteLength(body) else body.length
         'Content-Type': 'text/tab-separated-values; colenc=U'
 
     http.request options, (response) ->

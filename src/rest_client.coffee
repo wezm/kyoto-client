@@ -61,7 +61,7 @@ class RestClient
       method: 'PUT'
       path: "/#{escape(key)}"
       headers:
-        'Content-Length': value.length
+        'Content-Length': if typeof value == 'string' then Buffer.byteLength(value) else value.length
         'Connection': 'keep-alive'
 
     http.request options, (response) ->

@@ -56,6 +56,26 @@ module.exports =
         test.ifError error
         test.done()
 
+    'handles strings where length != byteLength': (test) ->
+      test.expect 4
+      barrier = 0
+      done = ->
+        barrier++
+        if barrier == 4
+          test.done()
+      db.set 'test', '\u00bd + \u00bc = \u00be', (error, output) ->
+        test.ifError error
+        done()
+      db.set 'test2', '\u00bd + \u00bc = \u00be', (error, output) ->
+        test.ifError error
+        done()
+      db.set 'test3', '\u00bd + \u00bc = \u00be', (error, output) ->
+        test.ifError error
+        done()
+      db.set 'test4', '\u00bd + \u00bc = \u00be', (error, output) ->
+        test.ifError error
+        done()
+
   add: testCase
     setUp: dbClear
 
