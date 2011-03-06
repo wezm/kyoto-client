@@ -11,18 +11,27 @@ class DB
   #   # not sure we need to do anything here
 
   open: (@host = 'localhost', @port = 1978) ->
+    # This is a bit of a hack... in order to use the 0.4 http API
+    agent = http.getAgent(@host, @port)
+    agent.maxSockets = 1
+
     @rpcClient = new RpcClient(@port, @host)
     @restClient = new RestClient(@port, @host)
     this
 
   close: (callback) ->
     # Make a dummy request with connection close specified
-    request = @client.request 'GET', '/rpc/echo',
-      'Connection': 'close'
-    request.end()
-
-    request.on 'end', ->
-      callback()
+    request =
+      host: @host
+      path: '/rpc/echo'
+      port: @port
+      headers:
+        'Connection': 'close'
+    http.get request, (response) ->
+      response.on 'end', ->
+        callback()
+    .on 'error', (error) ->
+      callback error
 
   echo: (input, callback) ->
     @rpcClient.call 'echo', input, (error, status, output) ->
