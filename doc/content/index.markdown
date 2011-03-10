@@ -946,15 +946,14 @@ cursor.get(true, function(error, output) {
 <a name="cur_delete"></a>
 #### ◆ delete `delete(callback)`
 
-Close the cursor's connection invalidate it. it will not be valid for
+Close the cursor's connection, invalidating it. It will not be valid for
 subsequent operations.
 
 **Note:** `delete` is a reserved word so the syntax for calling this procedure
 is a little awkward. Refer to examples.
 
-* `callback(error, value)` [Function] -- Callback function
+* `callback(error)` [Function] -- Callback function
   * `error` [Error] -- Set if an error occurs, otherwise `undefined`
-  * `output` [Cursor] -- Key-value pairs
 
 ##### Example
 <pre class="highlight"><code class="language-js">
