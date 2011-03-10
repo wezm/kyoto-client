@@ -102,6 +102,26 @@ Open a connection to the database.
 db.open('kyoto.example.com');
 </code></pre>
 
+<a name="close"></a>
+#### ◆ close `close(callback)`
+
+Close the connection to the database.
+
+Internally kyoto-client uses a persistent connection to the database to make
+requests faster. However to prevent your node application from hanging you
+must call `db.close` when you are done so that this persistent connection is
+closed.
+
+* `callback(error)` [Function] -- Callback function
+  * `error` [Error] -- Set if an error occurs, otherwise `undefined`
+
+##### Example
+<pre class="highlight"><code class="language-js">
+db.close(function(error) {
+  // Connection is now closed. The db can't be used anymore.
+});
+</code></pre>
+
 <a name="echo"></a>
 #### ◆ echo `echo(input, callback)`
 
