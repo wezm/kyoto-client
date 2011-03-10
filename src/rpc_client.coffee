@@ -9,7 +9,7 @@ class RpcClient
     this
 
   call: (procedure, args, callback) ->
-    body = ([escape(key), escape(value)].join("\t") for key, value of args).join("\n")
+    body = ([encodeURIComponent(key), encodeURIComponent(value)].join("\t") for key, value of args).join("\n")
     options =
       host: @host
       port: @port
@@ -41,7 +41,7 @@ class RpcClient
       switch colenc
         when 'U'
           tsv.transform (row, index) ->
-            unescape(col) for col in row
+            decodeURIComponent(col) for col in row
         when 'B'
           tsv.transform (row, index) ->
             base64.decode(col) for col in row

@@ -13,7 +13,7 @@ class RestClient
         throw new Error("Invalid number of arguments (#{args.length})");
 
   _buildPath: (database, key) ->
-    if database then "/#{escape(database)}/#{escape(key)}" else "/#{escape(key)}"
+    if database then "/#{encodeURIComponent(database)}/#{encodeURIComponent(key)}" else "/#{escape(key)}"
 
   get: (key, args...) ->
     [database, callback] = this._extractArgs(args)
