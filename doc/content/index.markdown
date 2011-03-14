@@ -1013,9 +1013,12 @@ Changelog
 
 ### 0.2.0 -- <time datetime="2011-03-05">5 Mar 2011</time>
 
-* node 0.4 compatibility
+* node 0.4 compatibility (no longer compatible with 0.2)
 * Handle base64 encoded responses
 * Add [db.exists](#exists)
+* Fix and test support for database argument to API calls
+* Fix encoding issues surrounding the use of escape/unescape by replacing them
+  with encodeURIComponent/decodeURIComponent.
 
 ### 0.1.1 -- <time datetime="2011-02-09">9 Feb 2011</time>
 
