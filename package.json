@@ -1,6 +1,6 @@
 {
   "name": "kyoto-client",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Client for Kyoto Tycoon",
   "homepage": "http://kyoto-client.org/",
   "author": "Wesley Moore <wes@wezm.net> (http://www.wezm.net/)",
@@ -31,10 +31,10 @@
     "test": "cake test"
   },
   "engines": {
-    "node": ">=0.2.5"
+    "node": ">=0.4.1"
   },
   "dependencies": {
-    "base64": "~1.0.0",
+    "base64": "~2.0.0",
     "csv": "~0.0.3"
   },
   "devDependencies": {
