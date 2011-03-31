@@ -3,7 +3,7 @@ util = require 'util'
 testCase = require('nodeunit').testCase
 
 db = new kt.Db()
-db.open()
+db.open('localhost', 1979)
 testDb = "test.kct"
 
 dbClear = (callback) ->
