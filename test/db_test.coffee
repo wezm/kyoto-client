@@ -183,6 +183,16 @@ module.exports =
           test.equal value, "Value"
           test.done()
 
+    'allows the database to be specified': (test) ->
+      test.expect 2
+      db.append 'test', 'other db', {database: 'test2.kct'}, (error, output) ->
+        test.ifError error
+
+        # Check that the value wasn't set on the default db
+        db.get 'test', (error, value) ->
+          test.ok value == null
+          test.done()
+
   increment: testCase
     setUp: dbClear
 
