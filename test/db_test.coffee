@@ -417,19 +417,36 @@ module.exports =
             test.done()
 
   removeBulk: testCase
-    setUp: dbClear
+    setUp: (callback) ->
+      @records =
+        bulk1: "Bulk\tValue"
+        bulk2: "Bulk Value 2"
+      dbClear callback
 
     'allows multiple values to be removed at once': (test) ->
       test.expect 3
-      records =
-        bulk1: "Bulk\tValue"
-        bulk2: "Bulk Value 2"
-      db.setBulk records, testDb, (error, output) ->
+      db.setBulk @records, (error, output) =>
         test.equal output.num, '2'
-        db.removeBulk records, testDb, (error, output) ->
+        db.removeBulk Object.keys(@records), (error, output) ->
           test.ifError error
           test.equal output.num, '2'
           test.done()
+
+    'allows the database to be specified': (test) ->
+      test.expect 3
+      options = {database: 'test2.kct'}
+      db.setBulk @records, (error, output) =>
+        db.setBulk @records, options, (error, output) =>
+          db.removeBulk Object.keys(@records), options, (error, output) ->
+            test.ifError error
+
+            # Check the it removed from the specified db and not the other
+            db.get 'bulk1', options, (error, value) ->
+              test.ok value == null
+
+              db.get 'bulk2', (error, value) ->
+                test.equal value, "Bulk Value 2"
+                test.done()
 
   getBulk: testCase
     setUp: dbClear
