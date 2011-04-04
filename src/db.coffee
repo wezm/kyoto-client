@@ -7,7 +7,8 @@ RpcClient = require './rpc_client'
 
 class DB
 
-  constructor: (@_defaultDatabase) ->
+  constructor: (@database) ->
+    throw new Error("default database must be passed to new") unless @database
 
   open: (@host = 'localhost', @port = 1978) ->
     # This is a bit of a hack... in order to use the 0.4 http API
@@ -33,8 +34,8 @@ class DB
       callback error
 
   defaultDatabase: (database) ->
-    @_defaultDatabase = database if database
-    @_defaultDatabase
+    @database = database if database
+    @database
 
   echo: (input, callback) ->
     @rpcClient.call 'echo', input, (error, status, output) ->
@@ -89,7 +90,7 @@ class DB
         throw new Error("Invalid number of arguments (#{args.length}) to clear");
 
     rpc_args = {}
-    rpc_args.DB = options.database or @_defaultDatabase
+    rpc_args.DB = options.database or @database
     @rpcClient.call 'clear', rpc_args, (error, status, output) ->
       if error?
         callback error, output

@@ -78,7 +78,7 @@ API
 The DB class is the primary interface to a Kyoto Tycoon database.
 
 <a name="new"></a>
-#### ◆ constructor `new([defaultDatabase])`
+#### ◆ constructor `new(defaultDatabase)`
 
 Constructs and returns a new DB object.
 
