@@ -390,17 +390,31 @@ module.exports =
           test.done()
 
   setBulk: testCase
-    setUp: dbClear
+    setUp: (callback) ->
+      @records =
+        bulk1: "Bulk\tValue"
+        bulk2: "Bulk Value 2"
+      dbClear callback
 
     'allows multiple values to be set at once': (test) ->
       test.expect 2
-      records =
-        bulk1: "Bulk\tValue"
-        bulk2: "Bulk Value 2"
-      db.setBulk records, testDb, (error, output) ->
+      db.setBulk @records, (error, output) ->
         test.ifError error
         test.equal output.num, '2'
         test.done()
+
+    'allows the database to be specified': (test) ->
+      test.expect 3
+      options = {database: 'test2.kct'}
+      db.setBulk @records, options, (error, output) ->
+        test.ifError error
+
+        db.get 'bulk1', (error, value) ->
+          test.ok value == null
+
+          db.get 'bulk2', options, (error, value) ->
+            test.equal value, "Bulk Value 2"
+            test.done()
 
   removeBulk: testCase
     setUp: dbClear
