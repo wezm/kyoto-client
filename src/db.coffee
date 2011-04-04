@@ -10,6 +10,11 @@ class DB
   constructor: (@database) ->
     throw new Error("default database must be passed to new") unless @database
 
+  _initRpcArgs: (options) ->
+    args = {}
+    args.DB = options.database or @database
+    args
+
   open: (@host = 'localhost', @port = 1978) ->
     # This is a bit of a hack... in order to use the 0.4 http API
     agent = http.getAgent(@host, @port)
@@ -68,8 +73,7 @@ class DB
       else
         throw new Error("Invalid number of arguments (#{args.length}) to status");
 
-    rpc_args = {}
-    rpc_args.DB = options.database or @database
+    rpc_args = this._initRpcArgs options
     @rpcClient.call 'status', rpc_args, (error, status, output) ->
       if error?
         callback error, output

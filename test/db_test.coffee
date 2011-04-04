@@ -53,11 +53,14 @@ module.exports =
       test.expect 2
       db.status (error, output) ->
         test.ok Object.keys(output).length > 0
-        test.ok output.hasOwnProperty 'count'
+        test.equal output.path, 'test.kct'
         test.done()
 
+    'allows the database to be specified': (test) ->
+      test.expect 2
+      db.status {database: 'test2.kct'}, (error, output) ->
         test.ok Object.keys(output).length > 0
-        test.ok output.hasOwnProperty 'count'
+        test.equal output.path, 'test2.kct'
         test.done()
 
   # TODO: set should accept numeric values and store them as such in Kyoto.
