@@ -63,15 +63,13 @@ module.exports =
         test.equal output.path, 'test2.kct'
         test.done()
 
-  # TODO: set should accept numeric values and store them as such in Kyoto.
-  # This would allow them to be incremented/decremented with the appropriate
-  # functions.
+  # TODO: set should accept Numbers
   set: testCase
     setUp: dbClear
 
     'completes without error': (test) ->
       test.expect 1
-      db.set 'test', "Test", testDb, (error, output) ->
+      db.set 'test', "Test", (error, output) ->
         test.ifError error
         test.done()
 
@@ -82,18 +80,28 @@ module.exports =
         barrier++
         if barrier == 4
           test.done()
-      db.set 'test', '\u00bd + \u00bc = \u00be', testDb, (error, output) ->
+      db.set 'test', '\u00bd + \u00bc = \u00be', (error, output) ->
         test.ifError error
         done()
-      db.set 'test2', '\u00bd + \u00bc = \u00be', testDb, (error, output) ->
+      db.set 'test2', '\u00bd + \u00bc = \u00be', (error, output) ->
         test.ifError error
         done()
-      db.set 'test3', '\u00bd + \u00bc = \u00be', testDb, (error, output) ->
+      db.set 'test3', '\u00bd + \u00bc = \u00be', (error, output) ->
         test.ifError error
         done()
-      db.set 'test4', '\u00bd + \u00bc = \u00be', testDb, (error, output) ->
+      db.set 'test4', '\u00bd + \u00bc = \u00be', (error, output) ->
         test.ifError error
         done()
+
+    'allows the database to be specified': (test) ->
+      test.expect 2
+      db.set 'test', 'other db', {database: 'test2.kct'}, (error, output) ->
+        test.ifError error
+
+        # Check that the value wasn't set on the default db
+        db.get 'test', (error, value) ->
+          test.ok value == null
+          test.done()
 
   add: testCase
     setUp: dbClear

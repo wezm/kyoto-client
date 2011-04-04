@@ -109,14 +109,16 @@ class DB
   # Note: value can be a string or Buffer for utf-8 strings it should be a Buffer
   set: (key, value, args...) ->
     switch args.length
-      when 1 then callback = args[0]
+      when 1
+        options  = {}
+        callback = args[0]
       when 2
-        database = args[0]
+        options  = args[0]
         callback = args[1]
       else
         throw new Error("Invalid number of arguments (#{args.length}) to set");
 
-    @restClient.put key, value, database, (error) ->
+    @restClient.put key, value, options.database or @database, (error) ->
       callback error
 
   # Add a record if it doesn't already exist
