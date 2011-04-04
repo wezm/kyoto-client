@@ -196,17 +196,18 @@ class DB
 
   increment: (key, num, args...) ->
     switch args.length
-      when 1 then callback = args[0]
+      when 1
+        options  = {}
+        callback = args[0]
       when 2
-        database = args[0]
+        options = args[0]
         callback = args[1]
       else
         throw new Error("Invalid number of arguments (#{args.length}) to increment");
 
-    rpc_args =
-      key: key
-      num: num
-    rpc_args.DB = database if database?
+    rpc_args     = this._initRpcArgs options
+    rpc_args.key = key
+    rpc_args.num = num
     @rpcClient.call 'increment', rpc_args, (error, status, output) ->
       if error?
         callback error, output
