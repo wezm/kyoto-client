@@ -269,14 +269,16 @@ class DB
 
   remove: (key, args...) ->
     switch args.length
-      when 1 then callback = args[0]
+      when 1
+        options  = {}
+        callback = args[0]
       when 2
-        database = args[0]
+        options  = args[0]
         callback = args[1]
       else
         throw new Error("Invalid number of arguments (#{args.length}) to remove");
 
-    @restClient.delete key, database, (error) ->
+    @restClient.delete key, options.database, (error) ->
       callback error
 
   exists: (key, args...) ->
@@ -294,14 +296,16 @@ class DB
   # key, [database], callback
   get: (key, args...) ->
     switch args.length
-      when 1 then callback = args[0]
+      when 1
+        options  = {}
+        callback = args[0]
       when 2
-        database = args[0]
+        options  = args[0]
         callback = args[1]
       else
         throw new Error("Invalid number of arguments (#{args.length}) to get");
 
-    @restClient.get key, database, (error, value) ->
+    @restClient.get key, options.database, (error, value) ->
       callback error, value
 
   setBulk: (records, args...) ->

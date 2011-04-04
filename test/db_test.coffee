@@ -321,34 +321,56 @@ module.exports =
 
     'removes records that exist': (test) ->
       test.expect 2
-      db.set 'test', 'old',testDb,  ->
-        db.remove 'test', testDb, (error) ->
+      db.set 'test', 'old',  ->
+        db.remove 'test', (error) ->
           test.ifError error
-          db.get 'test', testDb, (error, value) ->
+          db.get 'test', (error, value) ->
             test.equal value, null
             test.done()
 
     'returns an error if the record doesn\'t exist': (test) ->
       test.expect 2
-      db.remove 'test', testDb, (error) ->
+      db.remove 'test', (error) ->
         test.ok error?
         test.equal error.message, "Record not found"
         test.done()
+
+    'allows the database to be specified': (test) ->
+      test.expect 2
+      options = {database: 'test2.kct'}
+
+      # Set in both dbs, remove from one
+      db.set 'test', 'old', ->
+        db.set 'test', 'old', options, ->
+          db.remove 'test', options, (error) ->
+            test.ifError error
+            db.get 'test', options, (error, value) ->
+              test.equal value, null
+              test.done()
 
   get: testCase
     setUp: dbClear
 
     'returns null for non-existent key': (test) ->
       test.expect 1
-      db.get 'test', testDb, (error, value) ->
+      db.get 'test', (error, value) ->
         test.ok value == null
         test.done()
 
     'retrieves an existing key': (test) ->
       test.expect 1
-      db.set 'test', "Test\tValue", testDb, (error) ->
-        db.get 'test', testDb, (error, value) ->
+      db.set 'test', "Test\tValue", (error) ->
+        db.get 'test', (error, value) ->
           test.equal value, "Test\tValue"
+          test.done()
+
+    'allows the database to be specified': (test) ->
+      test.expect 2
+      db.set 'test', 'other db', (error, output) ->
+        test.ifError error
+
+        db.get 'test', {database: 'test2.kct'}, (error, value) ->
+          test.ok value == null
           test.done()
 
   exists: testCase
