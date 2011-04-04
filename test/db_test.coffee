@@ -7,8 +7,11 @@ db = new kt.Db testDb
 db.open('localhost', 1979)
 
 dbClear = (callback) ->
+  # Clear default db (tests that behaviour)
   db.clear (error, output) ->
-    callback()
+    # Clear alternate db (tests specifying the db)
+    db.clear {database: 'test2.kct'}, (error, output) ->
+      callback()
 
 module.exports =
   defaultDatabase: testCase
@@ -118,6 +121,16 @@ module.exports =
         db.add 'test', "Test", testDb, (error, output) ->
           test.ok error?
           test.equal error.message, "Record exists"
+          test.done()
+
+    'allows the database to be specified': (test) ->
+      test.expect 2
+      db.add 'test', 'other db', {database: 'test2.kct'}, (error, output) ->
+        test.ifError error
+
+        # Check that the value wasn't set on the default db
+        db.get 'test', (error, value) ->
+          test.ok value == null
           test.done()
 
   replace: testCase
