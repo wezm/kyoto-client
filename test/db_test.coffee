@@ -255,6 +255,16 @@ module.exports =
           test.ok error?
           test.done()
 
+    'allows the database to be specified': (test) ->
+      test.expect 2
+      db.incrementDouble 'test', 1.89, {database: 'test2.kct'}, (error, output) ->
+        test.ifError error
+
+        # Check that the value wasn't set on the default db
+        db.get 'test', (error, value) ->
+          test.ok value == null
+          test.done()
+
   cas: testCase
     setUp: dbClear
 
