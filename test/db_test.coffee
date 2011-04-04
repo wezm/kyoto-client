@@ -111,14 +111,14 @@ module.exports =
 
     'completes without error when the record does not exist': (test) ->
       test.expect 1
-      db.add 'test', "Test", testDb, (error, output) ->
+      db.add 'test', "Test", (error, output) ->
         test.ifError error
         test.done()
 
     'returns an error if the record exists': (test) ->
       test.expect 2
-      db.add 'test', "Test", testDb, (error, output) ->
-        db.add 'test', "Test", testDb, (error, output) ->
+      db.add 'test', "Test", (error, output) ->
+        db.add 'test', "Test", (error, output) ->
           test.ok error?
           test.equal error.message, "Record exists"
           test.done()
@@ -138,14 +138,14 @@ module.exports =
 
     'completes without error when the record exists': (test) ->
       test.expect 1
-      db.add 'test', "Test", testDb, (error, output) ->
-        db.replace 'test', "New Value", testDb, (error, output) ->
+      db.add 'test', "Test", (error, output) ->
+        db.replace 'test', "New Value", (error, output) ->
           test.ifError error
           test.done()
 
     'returns an error if the record does not exist': (test) ->
       test.expect 2
-      db.replace 'test', "New Value", testDb, (error, output) ->
+      db.replace 'test', "New Value", (error, output) ->
         test.ok error?
         test.equal error.message, "Record does not exist"
         test.done()
@@ -166,20 +166,20 @@ module.exports =
 
     'appends to an existing value': (test) ->
       test.expect 2
-      db.set 'test', "Test", testDb, (error, output) ->
-        db.append 'test', " Value", testDb, (error, output) ->
+      db.set 'test', "Test", (error, output) ->
+        db.append 'test', " Value", (error, output) ->
           test.ifError error
 
-          db.get 'test', testDb, (error, value) ->
+          db.get 'test', (error, value) ->
             test.equal value, "Test Value"
             test.done()
 
     'sets a non-existent value': (test) ->
       test.expect 2
-      db.append 'test', "Value", testDb, (error, output) ->
+      db.append 'test', "Value", (error, output) ->
         test.ifError error
 
-        db.get 'test', testDb, (error, value) ->
+        db.get 'test', (error, value) ->
           test.equal value, "Value"
           test.done()
 
@@ -198,24 +198,24 @@ module.exports =
 
     'increments compatible records': (test) ->
       test.expect 2
-      db.increment 'inc', 1, testDb, (error, output) ->
+      db.increment 'inc', 1, (error, output) ->
         test.equal output.num, '1'
 
-        db.increment 'inc', 4, testDb, (error, output) ->
+        db.increment 'inc', 4, (error, output) ->
           test.equal output.num, '5'
           test.done()
 
     'can increment by negative values': (test) ->
       test.expect 1
-      db.increment 'inc', -5, testDb, (error, output) ->
+      db.increment 'inc', -5, (error, output) ->
         test.equal output.num, '-5'
         test.done()
 
     'returns an error if the record is incompatible': (test) ->
       # Only records set via increment appear to be manipulatable with it.
       test.expect 1
-      db.set 'inc', '1', testDb, (error, output) ->
-        db.increment 'inc', 1, testDb, (error, output) ->
+      db.set 'inc', '1', (error, output) ->
+        db.increment 'inc', 1, (error, output) ->
           test.ok error?
           test.done()
 
@@ -234,24 +234,24 @@ module.exports =
 
     'increments compatible records': (test) ->
       test.expect 2
-      db.incrementDouble 'inc', 1.5, testDb, (error, output) ->
+      db.incrementDouble 'inc', 1.5, (error, output) ->
         test.equal output.num, '1.500000'
 
-        db.incrementDouble 'inc', 4.95, testDb, (error, output) ->
+        db.incrementDouble 'inc', 4.95, (error, output) ->
           test.equal output.num, '6.450000'
           test.done()
 
     'can increment by negative values': (test) ->
       test.expect 1
-      db.incrementDouble 'inc', -1.25, testDb, (error, output) ->
+      db.incrementDouble 'inc', -1.25, (error, output) ->
         test.equal output.num, '-1.250000'
         test.done()
 
     'returns an error if the record is incompatible': (test) ->
       # Only records set via increment appear to be manipulatable with it.
       test.expect 1
-      db.set 'inc', '1.3', testDb, (error, output) ->
-        db.incrementDouble 'inc', 0.100000, testDb, (error, output) ->
+      db.set 'inc', '1.3', (error, output) ->
+        db.incrementDouble 'inc', 0.100000, (error, output) ->
           test.ok error?
           test.done()
 
