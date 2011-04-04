@@ -2,12 +2,12 @@ kt = require '../lib/index'
 util = require 'util'
 testCase = require('nodeunit').testCase
 
-db = new kt.Db()
-db.open('localhost', 1979)
 testDb = "test.kct"
+db = new kt.Db testDb
+db.open('localhost', 1979)
 
 dbClear = (callback) ->
-  db.clear testDb, (error, output) ->
+  db.clear (error, output) ->
     callback()
 
 module.exports =
