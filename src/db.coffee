@@ -7,8 +7,7 @@ RpcClient = require './rpc_client'
 
 class DB
 
-  # constructor: (x) ->
-  #   # not sure we need to do anything here
+  constructor: (@defaultDatabase) ->
 
   open: (@host = 'localhost', @port = 1978) ->
     # This is a bit of a hack... in order to use the 0.4 http API

@@ -78,13 +78,20 @@ API
 The DB class is the primary interface to a Kyoto Tycoon database.
 
 <a name="new"></a>
-#### ◆ constructor `new()`
+#### ◆ constructor `new([defaultDatabase])`
 
-The constructor takes no arguments and returns a DB object.
+Constructs and returns a new DB object.
+
+* `defaultDatabase` [String] or [Number] -- The default Kyoto Tycoon database
+  to operate upon when not expicitly specified in a procedure. See also
+  [defaultDatabase](#defaultDatabase).
 
 ##### Example
 <pre class="highlight"><code class="language-js">var kt = require('kyoto-client');
 var db = new kt.Db();
+
+// With default database
+var db = new kt.Db('default.kct');
 </code></pre>
 
 <a name="open"></a>
