@@ -453,12 +453,25 @@ module.exports =
 
     'allows multiple values to be retrieved at once': (test) ->
       test.expect 2
-      db.set 'bulk1', "Bulk\tValue", testDb, (error) ->
-        db.set 'bulk2', "Bulk Value 2", testDb, (error) ->
-          db.getBulk ['bulk1', 'bulk3'], testDb, (error, results) ->
+      db.set 'bulk1', "Bulk\tValue", (error) ->
+        db.set 'bulk2', "Bulk Value 2", (error) ->
+          db.getBulk ['bulk1', 'bulk3'], (error, results) ->
             test.equal results.bulk1, "Bulk\tValue"
             test.ok not results.hasOwnProperty 'bulk3'
             test.done()
+
+    'allows the database to be specified': (test) ->
+      test.expect 2
+      records =
+        bulk1: "Bulk\tValue"
+        bulk2: "Bulk Value 2"
+      options = {database: 'test2.kct'}
+      db.setBulk records, options, (error, output) ->
+        test.ifError error
+
+        db.getBulk Object.keys(records), options, (error, results) ->
+          test.deepEqual results, records
+          test.done()
 
   matchPrefix: testCase
     setUp: (callback) ->
