@@ -51,7 +51,11 @@ module.exports =
 
     'returns status information about the database': (test) ->
       test.expect 2
-      db.status testDb, (error, output) ->
+      db.status (error, output) ->
+        test.ok Object.keys(output).length > 0
+        test.ok output.hasOwnProperty 'count'
+        test.done()
+
         test.ok Object.keys(output).length > 0
         test.ok output.hasOwnProperty 'count'
         test.done()

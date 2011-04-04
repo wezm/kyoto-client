@@ -59,15 +59,17 @@ class DB
 
   status: (args...) ->
     switch args.length
-      when 1 then callback = args[0]
+      when 1
+        options = {}
+        callback = args[0]
       when 2
-        database = args[0]
+        options = args[0]
         callback = args[1]
       else
         throw new Error("Invalid number of arguments (#{args.length}) to status");
 
     rpc_args = {}
-    rpc_args.DB = database if database?
+    rpc_args.DB = options.database or @database
     @rpcClient.call 'status', rpc_args, (error, status, output) ->
       if error?
         callback error, output
