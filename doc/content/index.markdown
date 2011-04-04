@@ -129,6 +129,29 @@ db.close(function(error) {
 });
 </code></pre>
 
+<a name="defaultDatabase"></a>
+#### ◆ close `defaultDatabase([database])`
+
+Set or get the default database.
+
+A Tokyo Tycoon server can host multiple databases. Requests can be directed
+at a particular database by name or number. E.g. `'users.kct'` or `1`.
+
+For procedures that accept a database option the value of defaultDatabase
+will be used if the option isn't specified.
+
+* `callback(error)` [String] or [Number] -- database to make default.
+  If not specified the current value for the default value is returned.
+
+##### Example
+<pre class="highlight"><code class="language-js">
+// Set the default database
+db.defaultDatabase('example.kct');
+
+// Retrieve the current default database value
+db.defaultDatabase();
+</code></pre>
+
 <a name="echo"></a>
 #### ◆ echo `echo(input, callback)`
 

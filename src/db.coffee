@@ -7,7 +7,7 @@ RpcClient = require './rpc_client'
 
 class DB
 
-  constructor: (@defaultDatabase) ->
+  constructor: (@_defaultDatabase) ->
 
   open: (@host = 'localhost', @port = 1978) ->
     # This is a bit of a hack... in order to use the 0.4 http API
@@ -31,6 +31,10 @@ class DB
         callback()
     .on 'error', (error) ->
       callback error
+
+  defaultDatabase: (database) ->
+    @_defaultDatabase = database if database
+    @_defaultDatabase
 
   echo: (input, callback) ->
     @rpcClient.call 'echo', input, (error, status, output) ->
@@ -85,7 +89,7 @@ class DB
         throw new Error("Invalid number of arguments (#{args.length}) to clear");
 
     rpc_args = {}
-    rpc_args.DB = options.database or @defaultDatabase
+    rpc_args.DB = options.database or @_defaultDatabase
     @rpcClient.call 'clear', rpc_args, (error, status, output) ->
       if error?
         callback error, output

@@ -11,6 +11,20 @@ dbClear = (callback) ->
     callback()
 
 module.exports =
+  defaultDatabase: testCase
+    setUp: dbClear
+
+    'allows the default database to be retrieved': (test) ->
+      test.expect 1
+      test.equal db.defaultDatabase(), "test.kct"
+      test.done()
+
+    # This would actually change the setting for the tests...
+    # 'allows the default database to be set': (test) ->
+    #   test.expect 1
+    #   test.equal db.defaultDatabase()
+    #   test.done()
+
   echo: testCase
     setUp: dbClear
 
