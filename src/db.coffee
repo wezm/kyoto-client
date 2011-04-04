@@ -244,18 +244,19 @@ class DB
 
   cas: (key, oval, nval, args...) ->
     switch args.length
-      when 1 then callback = args[0]
+      when 1
+        options  = {}
+        callback = args[0]
       when 2
-        database = args[0]
+        options  = args[0]
         callback = args[1]
       else
         throw new Error("Invalid number of arguments (#{args.length}) to cas");
 
-    rpc_args =
-      key: key
-      oval: oval
+    rpc_args      = this._initRpcArgs options
+    rpc_args.key  = key
+    rpc_args.oval = oval if oval?
     rpc_args.nval = nval if nval?
-    rpc_args.DB = database if database?
     @rpcClient.call 'cas', rpc_args, (error, status, output) ->
       if error?
         callback error, output

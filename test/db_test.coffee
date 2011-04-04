@@ -270,30 +270,50 @@ module.exports =
 
     'sets the new value when the old value matches': (test) ->
       test.expect 2
-      db.set 'test', 'old', testDb, ->
-        db.cas 'test', 'old', 'new', testDb, (error, output) ->
+      db.set 'test', 'old', ->
+        db.cas 'test', 'old', 'new', (error, output) ->
           test.ifError error
-          db.get 'test', testDb, (error, value) ->
+          db.get 'test', (error, value) ->
             test.equal value, 'new'
             test.done()
 
     'doesn\'t set the new value when the old value differs': (test) ->
       test.expect 3
-      db.set 'test', 'old', testDb, ->
-        db.cas 'test', 'not old', 'new', testDb, (error, output) ->
+      db.set 'test', 'old', ->
+        db.cas 'test', 'not old', 'new', (error, output) ->
           test.ok error?
           test.equal error.message, "Record has changed"
-          db.get 'test', testDb, (error, value) ->
+          db.get 'test', (error, value) ->
             test.equal value, 'old'
             test.done()
 
     'removes the record when the new value is null': (test) ->
       test.expect 2
-      db.set 'test', 'old', testDb, ->
-        db.cas 'test', 'old', null, testDb, (error, output) ->
+      db.set 'test', 'old', ->
+        db.cas 'test', 'old', null, (error, output) ->
           test.ifError error
-          db.get 'test', testDb, (error, value) ->
+          db.get 'test', (error, value) ->
             test.equal value, null
+            test.done()
+
+    'allows an initial value to be set with an old value of null': (test) ->
+      test.expect 2
+      db.cas 'test', null, 'value', (error, output) ->
+        test.ifError error
+        db.get 'test', (error, value) ->
+          test.equal value, 'value'
+          test.done()
+
+    'allows the database to be specified': (test) ->
+      test.expect 2
+      options = {database: 'test2.kct'}
+      db.add 'test', 'old', options, ->
+        db.cas 'test', 'old', 'new', options, (error, output) ->
+          test.ifError error
+
+          # Check that the value wasn't set on the default db
+          db.get 'test', (error, value) ->
+            test.ok value == null
             test.done()
 
   remove: testCase
