@@ -150,6 +150,17 @@ module.exports =
         test.equal error.message, "Record does not exist"
         test.done()
 
+    'allows the database to be specified': (test) ->
+      test.expect 2
+      options = {database: 'test2.kct'}
+      db.add 'test', 'other db', options, (error, output) ->
+        test.ifError error
+
+        # Will error if the wrong db is hit as the key wouldn't be set
+        db.replace 'test', "New Value", options, (error, output) ->
+          test.ifError error
+          test.done()
+
   append: testCase
     setUp: dbClear
 
