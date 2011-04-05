@@ -115,6 +115,17 @@ module.exports =
           test.ok expires instanceof Date
           test.done()
 
+    'allows the expiry time to be specified as a date': (test) ->
+      test.expect 2
+      expiry = new Date()
+      expiry.setUTCFullYear(expiry.getUTCFullYear() + 1)
+      db.set 'test', 'Value', {expires: expiry}, (error, output) ->
+        test.ifError error
+
+        db.get 'test', (error, value, expires) ->
+          test.equal expires.toUTCString(), expiry.toUTCString()
+          test.done()
+
   add: testCase
     setUp: dbClear
 
