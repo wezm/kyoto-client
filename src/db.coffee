@@ -283,14 +283,16 @@ class DB
 
   exists: (key, args...) ->
     switch args.length
-      when 1 then callback = args[0]
+      when 1
+        options  = {}
+        callback = args[0]
       when 2
-        database = args[0]
+        options  = args[0]
         callback = args[1]
       else
         throw new Error("Invalid number of arguments (#{args.length}) to exists");
 
-    @restClient.head key, database, (error, headers) ->
+    @restClient.head key, options.database, (error, headers) ->
       callback error, headers?
 
   # key, [database], callback

@@ -378,16 +378,26 @@ module.exports =
 
     'returns false for a non-existent key': (test) ->
       test.expect 1
-      db.exists 'not here', testDb, (error, result) ->
+      db.exists 'not here', (error, result) ->
         test.equal result, false
         test.done()
 
     'returns true when the key exists': (test) ->
       test.expect 1
-      db.set 'test', "Here", testDb, (error) ->
-        db.exists 'test', testDb, (error, result) ->
+      db.set 'test', "Here", (error) ->
+        db.exists 'test', (error, result) ->
           test.equal result, true
           test.done()
+
+    'allows the database to be specified': (test) ->
+      test.expect 2
+      options = {database: 'test2.kct'}
+      db.set 'test', "Here", options, (error) ->
+        db.exists 'test', (error, exists) ->
+          test.equal exists, false
+          db.exists 'test', options, (error, exists) ->
+            test.equal exists, true
+            test.done()
 
   setBulk: testCase
     setUp: (callback) ->
@@ -483,9 +493,9 @@ module.exports =
 
     'returns matching records': (test) ->
       test.expect 3
-      db.setBulk @records, testDb, (error, output) ->
+      db.setBulk @records, (error, output) ->
         test.equal output.num, '3'
-        db.matchPrefix 'bulk', null, testDb, (error, output) ->
+        db.matchPrefix 'bulk', null, (error, output) ->
           test.ifError error
           test.deepEqual output, [
             'bulk1',
@@ -495,9 +505,18 @@ module.exports =
 
     'allows the number of results to be limited': (test) ->
       test.expect 3
-      db.setBulk @records, testDb, (error, output) ->
+      db.setBulk @records, (error, output) ->
         test.equal output.num, '3'
-        db.matchPrefix 'bulk', 1, testDb, (error, output) ->
+        db.matchPrefix 'bulk', 1, (error, output) ->
+          test.ifError error
+          test.deepEqual output, [ 'bulk1' ]
+          test.done()
+
+    'allows the database to be specified': (test) ->
+      test.expect 3
+      db.setBulk @records, (error, output) ->
+        test.equal output.num, '3'
+        db.matchPrefix 'bulk', 1, (error, output) ->
           test.ifError error
           test.deepEqual output, [ 'bulk1' ]
           test.done()
@@ -513,9 +532,9 @@ module.exports =
 
     'returns matching records': (test) ->
       test.expect 3
-      db.setBulk @records, testDb, (error, output) ->
+      db.setBulk @records, (error, output) ->
         test.equal output.num, '4'
-        db.matchRegex '[0-9]', null, testDb, (error, output) ->
+        db.matchRegex '[0-9]', null, (error, output) ->
           test.ifError error
           test.deepEqual output, [
             'bulk1',
@@ -525,9 +544,9 @@ module.exports =
 
     'allows the number of results to be limited': (test) ->
       test.expect 3
-      db.setBulk @records, testDb, (error, output) ->
+      db.setBulk @records, (error, output) ->
         test.equal output.num, '4'
-        db.matchRegex '[0-9]', 1, testDb, (error, output) ->
+        db.matchRegex '[0-9]', 1, (error, output) ->
           test.ifError error
           test.deepEqual output, [ 'bulk1' ]
           test.done()
