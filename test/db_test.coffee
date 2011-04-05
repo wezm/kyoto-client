@@ -497,10 +497,7 @@ module.exports =
         test.equal output.num, '3'
         db.matchPrefix 'bulk', null, (error, output) ->
           test.ifError error
-          test.deepEqual output, [
-            'bulk1',
-            'bulk2'
-          ]
+          test.deepEqual output, [ 'bulk1', 'bulk2' ]
           test.done()
 
     'allows the number of results to be limited': (test) ->
@@ -513,13 +510,18 @@ module.exports =
           test.done()
 
     'allows the database to be specified': (test) ->
-      test.expect 3
-      db.setBulk @records, (error, output) ->
+      test.expect 5
+      options = {database: 'test2.kct'}
+      db.setBulk @records, options, (error, output) ->
         test.equal output.num, '3'
-        db.matchPrefix 'bulk', 1, (error, output) ->
+        db.matchPrefix 'bulk', null, options, (error, output) ->
           test.ifError error
-          test.deepEqual output, [ 'bulk1' ]
-          test.done()
+          test.deepEqual output, [ 'bulk1', 'bulk2' ]
+
+          db.matchPrefix 'bulk', (error, output) ->
+            test.ifError error
+            test.deepEqual output, []
+            test.done()
 
   matchRegex: testCase
     setUp: (callback) ->
@@ -550,3 +552,17 @@ module.exports =
           test.ifError error
           test.deepEqual output, [ 'bulk1' ]
           test.done()
+
+    'allows the database to be specified': (test) ->
+      test.expect 5
+      options = {database: 'test2.kct'}
+      db.setBulk @records, options, (error, output) ->
+        test.equal output.num, '4'
+        db.matchRegex 'bulk.*', null, options, (error, output) ->
+          test.ifError error
+          test.deepEqual output, [ 'bulk1', 'bulk2' ]
+
+          db.matchRegex 'bulk.*', (error, output) ->
+            test.ifError error
+            test.deepEqual output, []
+            test.done()

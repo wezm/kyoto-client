@@ -381,24 +381,25 @@ class DB
       callback undefined, results
 
   _matchUsing: (procedure, pattern, args) ->
+    options = {}
     switch args.length
-      when 1 then callback = args[0]
+      when 1
+        callback = args[0]
       when 2
         max      = args[0]
         callback = args[1]
       when 3
         max      = args[0]
-        database = args[1]
+        options  = args[1]
         callback = args[2]
       else
         throw new Error("Invalid number of arguments (#{args.length}) to #{procedure}");
 
-    rpc_args = {}
+    rpc_args = this._initRpcArgs options
     if procedure == 'match_prefix'
       rpc_args.prefix = pattern
     else
       rpc_args.regex = pattern
-    rpc_args.DB = database if database?
     rpc_args.max = max if max?
 
     @rpcClient.call procedure, rpc_args, (error, status, output) ->
