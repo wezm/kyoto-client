@@ -10,9 +10,10 @@ class DB
   constructor: (@database) ->
     throw new Error("default database must be passed to new") unless @database
 
-  _initRpcArgs: (options) ->
+  _initOptions: (options) ->
     args = {}
     args.DB = options.database or @database
+    args.xt = options.expires if options.expires?
     args
 
   open: (@host = 'localhost', @port = 1978) ->
@@ -73,7 +74,7 @@ class DB
       else
         throw new Error("Invalid number of arguments (#{args.length}) to status");
 
-    rpc_args = this._initRpcArgs options
+    rpc_args = this._initOptions options
     @rpcClient.call 'status', rpc_args, (error, status, output) ->
       if error?
         callback error, output
@@ -118,7 +119,8 @@ class DB
       else
         throw new Error("Invalid number of arguments (#{args.length}) to set");
 
-    @restClient.put key, value, options.database or @database, (error) ->
+    params = this._initOptions options
+    @restClient.put key, value, params, (error) ->
       callback error
 
   # Add a record if it doesn't already exist
@@ -133,7 +135,7 @@ class DB
       else
         throw new Error("Invalid number of arguments (#{args.length}) to add");
 
-    rpc_args       = this._initRpcArgs options
+    rpc_args       = this._initOptions options
     rpc_args.key   = key
     rpc_args.value = value
     @rpcClient.call 'add', rpc_args, (error, status, output) ->
@@ -158,7 +160,7 @@ class DB
       else
         throw new Error("Invalid number of arguments (#{args.length}) to replace");
 
-    rpc_args       = this._initRpcArgs options
+    rpc_args       = this._initOptions options
     rpc_args.key   = key
     rpc_args.value = value
     @rpcClient.call 'replace', rpc_args, (error, status, output) ->
@@ -182,7 +184,7 @@ class DB
       else
         throw new Error("Invalid number of arguments (#{args.length}) to append");
 
-    rpc_args       = this._initRpcArgs options
+    rpc_args       = this._initOptions options
     rpc_args.key   = key
     rpc_args.value = value
     @rpcClient.call 'append', rpc_args, (error, status, output) ->
@@ -205,7 +207,7 @@ class DB
       else
         throw new Error("Invalid number of arguments (#{args.length}) to increment");
 
-    rpc_args     = this._initRpcArgs options
+    rpc_args     = this._initOptions options
     rpc_args.key = key
     rpc_args.num = num
     @rpcClient.call 'increment', rpc_args, (error, status, output) ->
@@ -229,7 +231,7 @@ class DB
       else
         throw new Error("Invalid number of arguments (#{args.length}) to incrementDouble");
 
-    rpc_args     = this._initRpcArgs options
+    rpc_args     = this._initOptions options
     rpc_args.key = key
     rpc_args.num = num
     @rpcClient.call 'increment_double', rpc_args, (error, status, output) ->
@@ -253,7 +255,7 @@ class DB
       else
         throw new Error("Invalid number of arguments (#{args.length}) to cas");
 
-    rpc_args      = this._initRpcArgs options
+    rpc_args      = this._initOptions options
     rpc_args.key  = key
     rpc_args.oval = oval if oval?
     rpc_args.nval = nval if nval?
@@ -278,7 +280,8 @@ class DB
       else
         throw new Error("Invalid number of arguments (#{args.length}) to remove");
 
-    @restClient.delete key, options.database, (error) ->
+    params = this._initOptions options
+    @restClient.delete key, params, (error) ->
       callback error
 
   exists: (key, args...) ->
@@ -292,7 +295,8 @@ class DB
       else
         throw new Error("Invalid number of arguments (#{args.length}) to exists");
 
-    @restClient.head key, options.database, (error, headers) ->
+    params = this._initOptions options
+    @restClient.head key, params, (error, headers) ->
       callback error, headers?
 
   # key, [database], callback
@@ -307,8 +311,9 @@ class DB
       else
         throw new Error("Invalid number of arguments (#{args.length}) to get");
 
-    @restClient.get key, options.database, (error, value) ->
-      callback error, value
+    params = this._initOptions options
+    @restClient.get key, params, (error, value, expires) ->
+      callback error, value, expires
 
   setBulk: (records, args...) ->
     switch args.length
@@ -321,7 +326,7 @@ class DB
       else
         throw new Error("Invalid number of arguments (#{args.length}) to setBulk");
 
-    rpc_args = this._initRpcArgs options
+    rpc_args = this._initOptions options
     rpc_args["_#{key}"] = value for key, value of records
 
     @rpcClient.call 'set_bulk', rpc_args, (error, status, output) ->
@@ -343,7 +348,7 @@ class DB
       else
         throw new Error("Invalid number of arguments (#{args.length}) to removeBulk");
 
-    rpc_args = this._initRpcArgs options
+    rpc_args = this._initOptions options
     rpc_args["_#{key}"] = '' for key in keys
 
     @rpcClient.call 'remove_bulk', rpc_args, (error, status, output) ->
@@ -365,7 +370,7 @@ class DB
       else
         throw new Error("Invalid number of arguments (#{args.length}) to getBulk");
 
-    rpc_args = this._initRpcArgs options
+    rpc_args = this._initOptions options
     rpc_args["_#{key}"] = '' for key in keys
 
     @rpcClient.call 'get_bulk', rpc_args, (error, status, output) ->
@@ -395,7 +400,7 @@ class DB
       else
         throw new Error("Invalid number of arguments (#{args.length}) to #{procedure}");
 
-    rpc_args = this._initRpcArgs options
+    rpc_args = this._initOptions options
     if procedure == 'match_prefix'
       rpc_args.prefix = pattern
     else

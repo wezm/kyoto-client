@@ -106,6 +106,15 @@ module.exports =
           test.ok value == null
           test.done()
 
+    'allows the expiry time to be specified': (test) ->
+      test.expect 2
+      db.set 'test', 'Value', {expires: 60}, (error, output) ->
+        test.ifError error
+
+        db.get 'test', (error, value, expires) ->
+          test.ok expires instanceof Date
+          test.done()
+
   add: testCase
     setUp: dbClear
 
