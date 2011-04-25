@@ -97,16 +97,22 @@ var db = new kt.Db('default.kct');
 <a name="open"></a>
 #### ◆ open `open(hostname='localhost', port=1978)`
 
-Open a connection to the database.
+Open a connection to the database. Returns the Db object.
 
 * `hostname` [String] -- The hostname of the database.
 * `port` [Number] -- The port to connect to on the host.
 
-##### Example
+##### Examples
 <pre class="highlight"><code class="language-js">db.open();
 
 // on a different host
 db.open('kyoto.example.com');
+</code></pre>
+
+<pre class="highlight"><code class="language-js">var kyoto = require('kyoto-client');
+
+// Chained with new
+var db = new kyoto.Db().open('example.com', 1978);
 </code></pre>
 
 <a name="close"></a>
@@ -130,7 +136,7 @@ db.close(function(error) {
 </code></pre>
 
 <a name="defaultDatabase"></a>
-#### ◆ close `defaultDatabase([database])`
+#### ◆ defaultDatabase `defaultDatabase([database])`
 
 Set or get the default database.
 
@@ -140,8 +146,8 @@ at a particular database by name or number. E.g. `'users.kct'` or `1`.
 For procedures that accept a database option the value of defaultDatabase
 will be used if the option isn't specified.
 
-* `callback(error)` [String] or [Number] -- database to make default.
-  If not specified the current value for the default value is returned.
+* `database` [String] or [Number] -- database to make default.
+  If not specified the current value for the default database is returned.
 
 ##### Example
 <pre class="highlight"><code class="language-js">
@@ -221,11 +227,13 @@ Configure the replication configuration.
 Not yet implemented.
 
 <a name="status"></a>
-#### ◆ status `status([database], callback)`
+#### ◆ status `status([options], callback)`
 
-Get the miscellaneous status information about a database.
+Get miscellaneous status information about a database.
 
-* `database` [String] or [Number] -- A database name or index. For example: `test.kct` or `1`.
+* `options` [Object] -- Options hash
+  * `database` [String] or [Number] -- A database name or index.
+    For example: `test.kct` or `1`.
 * `callback(error, output)` [Function] -- Callback function
   * `error` [Error] -- Set if an error occurs, otherwise `undefined`
   * `output` [Object] -- Key-value pairs
@@ -271,14 +279,20 @@ db.status(function(error, output) {
  }
 */
 });
+
+// For a specific database
+db.status({database: "users.kct"}, function(error, output) {
+  // output contains status info for the users database
+});
 </code></pre>
 
 <a name="clear"></a>
-#### ◆ clear `clear([database], callback)`
+#### ◆ clear `clear([options], callback)`
 
 Remove all records from the database.
 
-* `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
+* `options` [Object] -- Options hash
+  * `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
 * `callback(error, output)` [Function] -- Callback function
   * `error` [Error] -- Set if an error occurs, otherwise `undefined`
   * `output` [Object] -- Key-value pairs
@@ -286,6 +300,11 @@ Remove all records from the database.
 ##### Example
 <pre class="highlight"><code class="language-js">
 db.clear(function(error, output) {
+  // output -> {}
+});
+
+// Clear a specific database
+db.clear({database: "test.kct"}, function(error, output) {
   // output -> {}
 });
 </code></pre>
@@ -298,13 +317,17 @@ Synchronize updated contents with the file and the device
 Not yet implemented.
 
 <a name="set"></a>
-#### ◆ set `set(key, value, [database], callback)`
+#### ◆ set `set(key, value, [options], callback)`
 
 Set value of a record.
 
 * `key` [String] -- The key of the record
 * `value` -- [String] or [Buffer] -- The value of the record
-* `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
+* `options` [Object] -- Options hash
+  * `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
+  * `expiry` [Date] or [Number] -- Set the expiry time of the record.
+    When a date, this value will be when the record expires. When a number
+    the record will expire in the the value specified seconds from now.
 * `callback(error)` [Function] -- Callback function
   * `error` [Error] -- Set if an error occurs, otherwise `undefined`
 
@@ -312,16 +335,31 @@ Set value of a record.
 <pre class="highlight"><code class="language-js">
 db.set('test', "Value", function(error) {
 });
+
+// Set a record in a specific database
+db.set('test', "Value", {database: "test.kct"}, function(error) {
+  // error -> undefined
+});
+
+// Set the record to expire in one minute
+db.set('test', "Value", {expiry: 60}, function(error) {
+});
+
+// Set the record to expire on 1 Jan 2020
+var expires = new Date("1 Jan 2020");
+db.set('test', "Value", {expiry: expires}, function(error) {
+});
 </code></pre>
 
 <a name="add"></a>
-#### ◆ add `add(key, value, [database], callback)`
+#### ◆ add `add(key, value, [options], callback)`
 
 Set value of a record. Returns an error if the record already exists.
 
 * `key` [String] -- The key of the record
 * `value` -- [String] or [Buffer] -- The value of the record
-* `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
+* `options` [Object] -- Options hash
+  * `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
 * `callback(error, output)` [Function] -- Callback function
   * `error` [Error] -- Set if an error occurs, otherwise `undefined`
   * `output` [Object] -- Key-value pairs
@@ -342,13 +380,14 @@ db.add('test', "Value", function(error, output) {
 </code></pre>
 
 <a name="replace"></a>
-#### ◆ replace `replace(key, value, [database], callback)`
+#### ◆ replace `replace(key, value, [options], callback)`
 
 Replace the value of a record. Returns an error if the record does not exist.
 
 * `key` [String] -- The key of the record
 * `value` -- [String] or [Buffer] -- The value of the record
-* `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
+* `options` [Object] -- Options hash
+  * `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
 * `callback(error, output)` [Function] -- Callback function
   * `error` [Error] -- Set if an error occurs, otherwise `undefined`
   * `output` [Object] -- Key-value pairs
@@ -370,13 +409,14 @@ db.replace('test', "Value", function(error, output) {
 </code></pre>
 
 <a name="append"></a>
-#### ◆ append `append(key, value, [database], callback)`
+#### ◆ append `append(key, value, [options], callback)`
 
 Append to the value of a record. Sets the record if it does not exist.
 
 * `key` [String] -- The key of the record
 * `value` -- [String] or [Buffer] -- The value to append to the record
-* `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
+* `options` [Object] -- Options hash
+  * `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
 * `callback(error, output)` [Function] -- Callback function
   * `error` [Error] -- Set if an error occurs, otherwise `undefined`
   * `output` [Object] -- Key-value pairs
@@ -404,7 +444,7 @@ db.append('test', "Value", function(error, output) {
 </code></pre>
 
 <a name="increment"></a>
-#### ◆ increment `increment(key, num, [database], callback)`
+#### ◆ increment `increment(key, num, [options], callback)`
 
 Increment the integer value of a compatible record. Sets the record if it does
 not exist.
@@ -416,10 +456,12 @@ set by other means results in an error (Kyoto Tycoon 0.9.29 (2.1) on Mac OS X
 
 * `key` [String] -- The key of the record
 * `num` -- [Number] -- The amount to increment the record by. Should be a positive or negative integer.
-* `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
+* `options` [Object] -- Options hash
+  * `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
 * `callback(error, output)` [Function] -- Callback function
   * `error` [Error] -- Set if an error occurs, otherwise `undefined`
-  * `output` [Object] -- Key-value pairs
+  * `output` [Object] -- Result from the server
+    * `num` -- the new value of the record
 
 ##### Example
 <pre class="highlight"><code class="language-js">
@@ -442,7 +484,7 @@ db.set('incompatible', "1", function(error, output) {
 </code></pre>
 
 <a name="increment_double"></a>
-#### ◆ incrementDouble `incrementDouble(key, num, [database], callback)`
+#### ◆ incrementDouble `incrementDouble(key, num, [options], callback)`
 
 Increment the double (floating point) value of a compatible record.
 Sets the record if it does not exist.
@@ -453,10 +495,12 @@ See note about compatible values in [increment].
 
 * `key` [String] -- The key of the record
 * `num` -- [Number] -- The amount to increment the record by. Can be positive or negative.
-* `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
+* `options` [Object] -- Options hash
+  * `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
 * `callback(error, output)` [Function] -- Callback function
   * `error` [Error] -- Set if an error occurs, otherwise `undefined`
-  * `output` [Object] -- Key-value pairs
+  * `output` [Object] -- Result from the server
+    * `num` -- the new value of the record
 
 ##### Example
 <pre class="highlight"><code class="language-js">
@@ -479,16 +523,18 @@ db.set('incompatible', "1", function(error, output) {
 </code></pre>
 
 <a name="cas"></a>
-#### ◆ cas `cas(key, oval, nval, [database], callback)`
+#### ◆ cas `cas(key, oval, nval, [options], callback)`
 
 Performs a compare-and-swap operation. The value is only updated if the
 assumed existing value matches.
 
 * `key` [String] -- The key of the record
-* `oval` -- [String] or [Buffer] -- The assumed old value
+* `oval` -- [String] or [Buffer] -- The assumed old value. Set to `null` if the
+  record does not currently have a value.
 * `nval` -- [String] or [Buffer] -- The new value. Set to `null` to remove the
   record.
-* `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
+* `options` [Object] -- Options hash
+  * `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
 * `callback(error, output)` [Function] -- Callback function
   * `error` [Error] -- Set if an error occurs, otherwise `undefined`
   * `output` [Object] -- Key-value pairs
@@ -524,12 +570,13 @@ db.set('test', 'old', function() {
 </code></pre>
 
 <a name="remove"></a>
-#### ◆ remove `remove(key, [database], callback)`
+#### ◆ remove `remove(key, [options], callback)`
 
 Removes a record.
 
 * `key` [String] -- The key of the record to remove
-* `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
+* `options` [Object] -- Options hash
+  * `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
 * `callback(error)` [Function] -- Callback function
   * `error` [Error] -- `undefined` if the record was successfully removed.
 
@@ -548,15 +595,17 @@ db.remove('non-existent', function(error) {
 </code></pre>
 
 <a name="get"></a>
-#### ◆ get `get(key, [database], callback)`
+#### ◆ get `get(key, [options], callback)`
 
 Get the value of a record. Returns `null` if the record doesn't exist.
 
 * `key` [String] -- The key of the record
-* `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
-* `callback(error, value)` [Function] -- Callback function
+* `options` [Object] -- Options hash
+  * `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
+* `callback(error, value, expires)` [Function] -- Callback function
   * `error` [Error] -- Set if an error occurs, otherwise `undefined`
   * `value` [Buffer] -- The value of the record
+  * `expires` [Date] -- The date the record expires if set, otherwise `null`.
 
 ##### Example
 <pre class="highlight"><code class="language-js">
@@ -572,17 +621,27 @@ db.get('not here', function(error, value) {
   // error  -> undefined
   // value  -> null
 });
+
+// Record with an expiry date
+db.set('key', "Will Expire", {expiry: 60}, function(error) {
+  db.get('key', function(error, value, expires) {
+    // error   -> undefined
+    // value   -> "Will Expire"
+    // expires -> Date(now + 60 seconds)
+  });
+});
 </code></pre>
 
 <a name="exists"></a>
-#### ◆ exists `exists(key, [database], callback)`
+#### ◆ exists `exists(key, [options], callback)`
 
 Checks if a record with the specified key exists. Returns true if it does,
 false otherwise.
 
 * `key` [String] -- The key of the record
-* `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
-* `callback(error, value)` [Function] -- Callback function
+* `options` [Object] -- Options hash
+  * `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
+* `callback(error, result)` [Function] -- Callback function
   * `error` [Error] -- Set if an error occurs, otherwise `undefined`
   * `result` [Boolean] -- `true` if the record exists, `false` otherwise
 
@@ -603,12 +662,13 @@ db.exists('not here', function(error, result) {
 </code></pre>
 
 <a name="set_bulk"></a>
-#### ◆ setBulk `setBulk(records, [database], callback)`
+#### ◆ setBulk `setBulk(records, [options], callback)`
 
 Set multiple records at once.
 
 * `records` [Object] -- The records to set with keys and values set appropriately.
-* `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
+* `options` [Object] -- Options hash
+  * `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
 * `callback(error, output)` [Function] -- Callback function
   * `error` [Error] -- Set if an error occurs, otherwise `undefined`
   * `output` [Object] -- Result from the server
@@ -626,12 +686,13 @@ db.setBulk(records, function(error, output) {
 </code></pre>
 
 <a name="remove_bulk"></a>
-#### ◆ removeBulk `removeBulk(keys, [database], callback)`
+#### ◆ removeBulk `removeBulk(keys, [options], callback)`
 
 Remove multiple records at once.
 
 * `keys` [Array] -- An array of keys to remove
-* `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
+* `options` [Object] -- Options hash
+  * `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
 * `callback(error, output)` [Function] -- Callback function
   * `error` [Error] -- Set if an error occurs, otherwise `undefined`
   * `output` [Object] -- Result from the server
@@ -651,12 +712,13 @@ db.setBulk(records, function(error, output) {
 </code></pre>
 
 <a name="get_bulk"></a>
-#### ◆ getBulk `getBulk(keys, [database], callback)`
+#### ◆ getBulk `getBulk(keys, [options], callback)`
 
 Retrieve multiple records at once.
 
 * `keys` [Array] -- An array of keys to retrieve
-* `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
+* `options` [Object] -- Options hash
+  * `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
 * `callback(error, results)` [Function] -- Callback function
   * `error` [Error] -- Set if an error occurs, otherwise `undefined`
   * `results` [Object] -- The values for each of the requested keys by key. Where a record
@@ -680,7 +742,7 @@ db.set('bulk1', "Bulk\tValue", function () {
 Not yet implemented.
 
 <a name="match_prefix"></a>
-#### ◆ matchPrefix `matchPrefix(prefix, [max], [database], callback)`
+#### ◆ matchPrefix `matchPrefix(prefix, [max], [options], callback)`
 
 Returns keys matching the supplied prefix.
 
@@ -690,7 +752,8 @@ and `callback`.
 * `prefix` [String] -- The prefix to match keys against
 * `max` [Number] -- The maximum number of results to return. If null or less
   than 0 then no limit is applied.
-* `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
+* `options` [Object] -- Options hash
+  * `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
 * `callback(error, results)` [Function] -- Callback function
   * `error` [Error] -- Set if an error occurs, otherwise `undefined`
   * `results` [Array] -- The matching keys
@@ -719,7 +782,7 @@ db.setBulk(this.records, function(error, output) {
 </code></pre>
 
 <a name="match_regex"></a>
-#### ◆ matchRegex `matchRegex(regex, [max], [database], callback)`
+#### ◆ matchRegex `matchRegex(regex, [max], [options], callback)`
 
 Returns keys matching the supplied regular expression.
 
@@ -732,7 +795,8 @@ and `callback`.
   (E.g. `[0-9]`), `'.'`, `'*'` are supported but not `'+'`.
 * `max` [Number] -- The maximum number of results to return. If null or less
   than 0 then no limit is applied.
-* `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
+* `options` [Object] -- Options hash
+  * `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
 * `callback(error, results)` [Function] -- Callback function
   * `error` [Error] -- Set if an error occurs, otherwise `undefined`
   * `results` [Array] -- The matching keys
@@ -793,14 +857,16 @@ function.
 [getCursor]: #get_cursor
 
 <a name="cur_jump"></a>
-#### ◆ jump `jump([key], [database], callback)`
+#### ◆ jump `jump([key], [options], callback)`
 
 Jump the cursor to the specified record or the first record if no key is
 specified.
 
-* `key` [String] -- The key to start scanning from.
-* `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
-* `callback(error, value)` [Function] -- Callback function
+* `key` [String] -- The key to start scanning from. To start from the beginning
+  specify `null`.
+* `options` [Object] -- Options hash
+  * `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
+* `callback(error, output)` [Function] -- Callback function
   * `error` [Error] -- Set if an error occurs, otherwise `undefined`
   * `output` [Object] -- Key-value pairs
 
@@ -816,13 +882,14 @@ cursor.jump('test', function(error, output) {
 </code></pre>
 
 <a name="cur_jump_back"></a>
-#### ◆ jumpBack `jumpBack([key], [database], callback)`
+#### ◆ jumpBack `jumpBack([key], [options], callback)`
 
 Jump the cursor to the specified record or the last record if no key is
 specified.
 
 * `key` [String] -- The key to start scanning from.
-* `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
+* `options` [Object] -- Options hash
+  * `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
 * `callback(error, value)` [Function] -- Callback function
   * `error` [Error] -- Set if an error occurs, otherwise `undefined`
   * `output` [Object] -- Key-value pairs
@@ -1031,16 +1098,38 @@ cursor.each(function(error, output) {
 [Boolean]: https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean
 [Buffer]: http://nodejs.org/docs/v0.2.6/api.html#buffers-2
 [Cursor]: #cursor
+[Date]: https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Date
 [Error]: https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Error
 [Function]: https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function
 [Number]: https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number
 [Object]: https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object
 [String]: https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String
 
+<a name="related"></a>
+Related Projects
+---------
+
+<a name="connect-kyoto"></a>
+### connect-kyoto
+
+[connect-kyoto] allows Kyoto Tycoon to be used as a session store for
+[connect].
+
+[connect-kyoto]: https://github.com/wezm/connect-kyoto
+[connect]: http://senchalabs.github.com/connect/
+
 <a name="changelog"></a>
 Changelog
 ---------
 
+<a name="0.3.0"></a>
+### 0.3.0 -- <time datetime="2011-04-25">25 Apr 2011</time>
+
+* Require a default database to be specified to new
+* Change database argument to be specified via an options hash
+* Support for record expiry in `set` and `get`
+
+<a name="0.2.0"></a>
 ### 0.2.0 -- <time datetime="2011-03-05">5 Mar 2011</time>
 
 * node 0.4 compatibility (no longer compatible with 0.2)
@@ -1050,10 +1139,12 @@ Changelog
 * Fix encoding issues surrounding the use of escape/unescape by replacing them
   with encodeURIComponent/decodeURIComponent.
 
+<a name="0.1.1"></a>
 ### 0.1.1 -- <time datetime="2011-02-09">9 Feb 2011</time>
 
 Some last  minute documentation additions.
 
+<a name="0.1.0"></a>
 ### 0.1.0 -- <time datetime="2011-02-09">9 Feb 2011</time>
 
 Initial release.
