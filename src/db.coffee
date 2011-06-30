@@ -427,20 +427,23 @@ class DB
   matchRegex: (regex, args...) ->
     this._matchUsing 'match_regex', regex, args
 
-  # [key], callback
+  # [key], [options], callback
   getCursor: (args...) ->
     switch args.length
       when 1
         options  = {}
         callback = args[0]
       when 2
-        key = args[0]
+        options  = {}
+        key      = args[0]
         callback = args[1]
+      when 3
+        [key, options, callback] = args
       else
         throw new Error("Invalid number of arguments (#{args.length}) to getCursor");
 
     cursor = new Cursor(this)
-    cursor.jump key, (error) ->
+    cursor.jump key, options, (error) ->
       callback error, cursor
 
 module.exports = DB

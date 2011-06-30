@@ -13,21 +13,19 @@ class Cursor
     this
 
   _jumpUsing: (procedure, args) ->
+    options = {}
     switch args.length
       when 1 then callback = args[0]
       when 2
-        key      = args[0]
-        callback = args[1]
+        [key, callback] = args
       when 3
-        key      = args[0]
-        database = args[1]
-        callback = args[2]
+        [key, options, callback] = args
       else
         throw new Error("Invalid number of arguments (#{args.length}) to #{procedure}");
 
     rpc_args = {CUR: 1}
     rpc_args.key = key if key?
-    rpc_args.DB = database if database?
+    rpc_args.DB = options.database or @db.database
 
     @client.call procedure, rpc_args, (error, status, output) ->
       if error?

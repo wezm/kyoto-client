@@ -2,7 +2,18 @@ kt = require '../lib/index'
 util = require 'util'
 testCase = require('nodeunit').testCase
 
-testDb = "test.kct"
+###
+
+These tests need a running instance of kyoto tycoon running:
+
+    ktserver -port 1979 'test#type=kct' 'test2#type=kct'
+
+Tree type databases are used as the order of values retrieved is important
+for the cursor tests
+
+###
+
+testDb = "test"
 db = new kt.Db testDb
 db.open('localhost', 1979)
 
@@ -10,7 +21,7 @@ dbClear = (callback) ->
   # Clear default db (tests that behaviour)
   db.clear (error, output) ->
     # Clear alternate db (tests specifying the db)
-    db.clear {database: 'test2.kct'}, (error, output) ->
+    db.clear {database: 'test2'}, (error, output) ->
       callback()
 
 module.exports =
@@ -19,7 +30,7 @@ module.exports =
 
     'allows the default database to be retrieved': (test) ->
       test.expect 1
-      test.equal db.defaultDatabase(), "test.kct"
+      test.equal db.defaultDatabase(), "test"
       test.done()
 
     # This would actually change the setting for the tests...
@@ -56,14 +67,14 @@ module.exports =
       test.expect 2
       db.status (error, output) ->
         test.ok Object.keys(output).length > 0
-        test.equal output.path, 'test.kct'
+        test.equal output.path, 'test'
         test.done()
 
     'allows the database to be specified': (test) ->
       test.expect 2
-      db.status {database: 'test2.kct'}, (error, output) ->
+      db.status {database: 'test2'}, (error, output) ->
         test.ok Object.keys(output).length > 0
-        test.equal output.path, 'test2.kct'
+        test.equal output.path, 'test2'
         test.done()
 
   # TODO: set should accept Numbers
@@ -98,7 +109,7 @@ module.exports =
 
     'allows the database to be specified': (test) ->
       test.expect 2
-      db.set 'test', 'other db', {database: 'test2.kct'}, (error, output) ->
+      db.set 'test', 'other db', {database: 'test2'}, (error, output) ->
         test.ifError error
 
         # Check that the value wasn't set on the default db
@@ -145,7 +156,7 @@ module.exports =
 
     'allows the database to be specified': (test) ->
       test.expect 2
-      db.add 'test', 'other db', {database: 'test2.kct'}, (error, output) ->
+      db.add 'test', 'other db', {database: 'test2'}, (error, output) ->
         test.ifError error
 
         # Check that the value wasn't set on the default db
@@ -172,7 +183,7 @@ module.exports =
 
     'allows the database to be specified': (test) ->
       test.expect 2
-      options = {database: 'test2.kct'}
+      options = {database: 'test2'}
       db.add 'test', 'other db', options, (error, output) ->
         test.ifError error
 
@@ -205,7 +216,7 @@ module.exports =
 
     'allows the database to be specified': (test) ->
       test.expect 2
-      db.append 'test', 'other db', {database: 'test2.kct'}, (error, output) ->
+      db.append 'test', 'other db', {database: 'test2'}, (error, output) ->
         test.ifError error
 
         # Check that the value wasn't set on the default db
@@ -241,7 +252,7 @@ module.exports =
 
     'allows the database to be specified': (test) ->
       test.expect 2
-      db.increment 'test', 10, {database: 'test2.kct'}, (error, output) ->
+      db.increment 'test', 10, {database: 'test2'}, (error, output) ->
         test.ifError error
 
         # Check that the value wasn't set on the default db
@@ -277,7 +288,7 @@ module.exports =
 
     'allows the database to be specified': (test) ->
       test.expect 2
-      db.incrementDouble 'test', 1.89, {database: 'test2.kct'}, (error, output) ->
+      db.incrementDouble 'test', 1.89, {database: 'test2'}, (error, output) ->
         test.ifError error
 
         # Check that the value wasn't set on the default db
@@ -326,7 +337,7 @@ module.exports =
 
     'allows the database to be specified': (test) ->
       test.expect 2
-      options = {database: 'test2.kct'}
+      options = {database: 'test2'}
       db.add 'test', 'old', options, ->
         db.cas 'test', 'old', 'new', options, (error, output) ->
           test.ifError error
@@ -357,7 +368,7 @@ module.exports =
 
     'allows the database to be specified': (test) ->
       test.expect 2
-      options = {database: 'test2.kct'}
+      options = {database: 'test2'}
 
       # Set in both dbs, remove from one
       db.set 'test', 'old', ->
@@ -389,7 +400,7 @@ module.exports =
       db.set 'test', 'other db', (error, output) ->
         test.ifError error
 
-        db.get 'test', {database: 'test2.kct'}, (error, value) ->
+        db.get 'test', {database: 'test2'}, (error, value) ->
           test.ok value == null
           test.done()
 
@@ -411,7 +422,7 @@ module.exports =
 
     'allows the database to be specified': (test) ->
       test.expect 2
-      options = {database: 'test2.kct'}
+      options = {database: 'test2'}
       db.set 'test', "Here", options, (error) ->
         db.exists 'test', (error, exists) ->
           test.equal exists, false
@@ -435,7 +446,7 @@ module.exports =
 
     'allows the database to be specified': (test) ->
       test.expect 3
-      options = {database: 'test2.kct'}
+      options = {database: 'test2'}
       db.setBulk @records, options, (error, output) ->
         test.ifError error
 
@@ -464,7 +475,7 @@ module.exports =
 
     'allows the database to be specified': (test) ->
       test.expect 3
-      options = {database: 'test2.kct'}
+      options = {database: 'test2'}
       db.setBulk @records, (error, output) =>
         db.setBulk @records, options, (error, output) =>
           db.removeBulk Object.keys(@records), options, (error, output) ->
@@ -495,7 +506,7 @@ module.exports =
       records =
         bulk1: "Bulk\tValue"
         bulk2: "Bulk Value 2"
-      options = {database: 'test2.kct'}
+      options = {database: 'test2'}
       db.setBulk records, options, (error, output) ->
         test.ifError error
 
@@ -531,7 +542,7 @@ module.exports =
 
     'allows the database to be specified': (test) ->
       test.expect 5
-      options = {database: 'test2.kct'}
+      options = {database: 'test2'}
       db.setBulk @records, options, (error, output) ->
         test.equal output.num, '3'
         db.matchPrefix 'bulk', null, options, (error, output) ->
@@ -575,7 +586,7 @@ module.exports =
 
     'allows the database to be specified': (test) ->
       test.expect 5
-      options = {database: 'test2.kct'}
+      options = {database: 'test2'}
       db.setBulk @records, options, (error, output) ->
         test.equal output.num, '4'
         db.matchRegex 'bulk.*', null, options, (error, output) ->
