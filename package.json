@@ -31,7 +31,7 @@
     "test": "cake test"
   },
   "engines": {
-    "node": ">=0.4.1"
+    "node": "0.4.x"
   },
   "dependencies": {
     "base64": "~2.0.0",
