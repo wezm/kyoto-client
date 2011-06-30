@@ -825,14 +825,22 @@ db.setBulk(this.records, function(error, output) {
 </code></pre>
 
 <a name="get_cursor"></a>
-#### ◆ getCursor `getCursor([key], callback)`
+#### ◆ getCursor `getCursor([key], [options], callback)`
 
-Obtain a database cursor. A cursor allows you to scan forwards through the
-records in the database.
+Obtain a database cursor. A cursor allows you to scan through the records in
+the database.
 
-**TODO:** This needs to be amended to accept a database
+**Note:** The number of arguments is interpreted as follows:
+
+<ol>
+  <li>callback</li>
+  <li>key, callback</li>
+  <li>key, options, callback</li>
+</ol>
 
 * `key` [String] -- The key to start scanning from.
+* `options` [Object] -- Options hash
+  * `database` [String] or [Number] -- A database name or index. For example: `'test.kct'` or `1`.
 * `callback(error, cursor)` [Function] -- Callback function
   * `error` [Error] -- Set if an error occurs, otherwise `undefined`
   * `cursor` [Cursor] -- A cursor starting at `key`
@@ -862,6 +870,14 @@ function.
 Jump the cursor to the specified record or the first record if no key is
 specified.
 
+**Note:** The number of arguments is interpreted as follows:
+
+<ol>
+  <li>callback</li>
+  <li>key, callback</li>
+  <li>key, options, callback</li>
+</ol>
+
 * `key` [String] -- The key to start scanning from. To start from the beginning
   specify `null`.
 * `options` [Object] -- Options hash
@@ -886,6 +902,14 @@ cursor.jump('test', function(error, output) {
 
 Jump the cursor to the specified record or the last record if no key is
 specified.
+
+**Note:** The number of arguments is interpreted as follows:
+
+<ol>
+  <li>callback</li>
+  <li>key, callback</li>
+  <li>key, options, callback</li>
+</ol>
 
 * `key` [String] -- The key to start scanning from.
 * `options` [Object] -- Options hash
@@ -1121,6 +1145,12 @@ Related Projects
 <a name="changelog"></a>
 Changelog
 ---------
+
+<a name="0.4.0"></a>
+### 0.4.0 -- <time datetime="2011-06-30">30 Jun 2011</time>
+
+* Allow a database to be specified to getCursor
+* Actually support the documented database argument to Cursor.jump
 
 <a name="0.3.0"></a>
 ### 0.3.0 -- <time datetime="2011-04-25">25 Apr 2011</time>
