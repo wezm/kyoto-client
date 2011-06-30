@@ -43,5 +43,5 @@ data_sources:
 base_url: 'http://kyoto-client.org'
 deploy:
   default:
-    dst:     "kyoto@kyoto-client.org:www"
+    dst:     "kyoto-client.org:www/kyoto-client.org"
     options: [ '-avz', '--delete', '--exclude=".svn"' ]
