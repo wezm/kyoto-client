@@ -17,9 +17,7 @@ class DB
     args
 
   open: (@host = 'localhost', @port = 1978) ->
-    # This is a bit of a hack... in order to use the 0.4 http API
-    agent = http.getAgent(@host, @port)
-    agent.maxSockets = 1
+    http.globalAgent.maxSockets = 1;
 
     @rpcClient = new RpcClient(@port, @host)
     @restClient = new RestClient(@port, @host)
