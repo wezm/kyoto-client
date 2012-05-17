@@ -9,10 +9,10 @@ stdout        = process.stdout
 process.env["PATH"] = "node_modules/.bin:#{process.env["PATH"]}"
 
 # ANSI Terminal Colors.
-bold  = "\033[0;1m"
-red   = "\033[0;31m"
-green = "\033[0;32m"
-reset = "\033[0m"
+bold  = "\u001b[0;1m"
+red   = "\u001b[0;31m"
+green = "\u001b[0;32m"
+reset = "\u001b[0m"
 
 # Log a message with a color.
 log = (message, color, explanation) ->
@@ -29,12 +29,12 @@ onerror = (err)->
 
 # Setup development dependencies, not part of runtime dependencies.
 task "setup", "Install development dependencies", ->
-  fs.readFile "package.json", "utf8", (err, package)->
+  fs.readFile "package.json", "utf8", (err, pkg)->
     log "Need runtime dependencies, installing into node_modules ...", green
     exec "npm bundle", onerror
 
     log "Need development dependencies, installing ...", green
-    for name, version of JSON.parse(package).devDependencies
+    for name, version of JSON.parse(pkg).devDependencies
       log "Installing #{name} #{version}", green
       exec "npm bundle install \"#{name}@#{version}\"", onerror
 
