@@ -22,7 +22,7 @@ class RpcClient
     http.request options, (response) ->
       data = {}
 
-      tsv = csv().fromStream response,
+      tsv = csv().from.stream response,
         delimiter: "\t"
         escape: ""
         encoding: 'ascii' # All content is ASCII safe (I.e. base64 or url-encoded)
