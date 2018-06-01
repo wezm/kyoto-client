@@ -8,17 +8,6 @@
     <link rel="stylesheet" type="text/css" href="/highlight.css" media="screen" />
     <meta name="generator" content="nanoc <%= Nanoc3::VERSION %>" />
     <meta name="author" content="Wesley Moore" />
-    <script type="text/javascript">
-      var _gaq = _gaq || [];
-      _gaq.push(['_setAccount', 'UA-199609-7']);
-      _gaq.push(['_trackPageview']);
-
-      (function() {
-        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-      })();
-    </script>
     <script src="/modernizr-1.6.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="/raphael-min.js" type="text/javascript" charset="utf-8"></script>
     <script src="/app.js" type="text/javascript" charset="utf-8"></script>
@@ -27,7 +16,7 @@
     <%= render 'sidebar' %>
     <section id="main">
       <%= yield %>
-      <footer>  
+      <footer>
         Copyright &copy; <%= [2011, Date.today.year].uniq.join ' &ndash; ' %>
         <a href="http://www.wezm.net/">Wesley Moore</a> &ndash; <a href="http://twitter.com/wezm">@wezm</a>
       </footer>
